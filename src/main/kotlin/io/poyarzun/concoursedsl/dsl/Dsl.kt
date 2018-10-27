@@ -1,70 +1,63 @@
 package io.poyarzun.concoursedsl.dsl
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import io.poyarzun.concoursedsl.domain.Config
-import io.poyarzun.concoursedsl.domain.Job
-import io.poyarzun.concoursedsl.domain.Resource
-import io.poyarzun.concoursedsl.domain.Step
+import io.poyarzun.concoursedsl.domain.*
 
-typealias Part<T> = T.() -> Unit
+@DslMarker
+annotation class ConcourseDslMarker
 
-fun Part<Config>.generateYML(): String {
-    val mapper = ObjectMapper(YAMLFactory())
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-    mapper.registerModule(KotlinModule())
-    val config = Config()
-    this.invoke(config)
-    return mapper.writeValueAsString(config)
+@ConcourseDslMarker
+open class ConcourseDsl
+
+typealias Init<T> = T.() -> Unit
+
+fun Pipeline.job(name: String, init: Init<Job>) =
+    jobs.add(Job(name).apply(init))
+
+fun Pipeline.group(name: String, init: Init<Group>) =
+    groups.add(Group(name).apply(init))
+
+fun Pipeline.resource(name: String, type: String, init: Init<Resource>) =
+    resources.add(Resource(name, type).apply(init))
+
+fun Pipeline.resourceType(name: String, type: String, init: Init<ResourceType>) =
+    resourceTypes.add(ResourceType(name, type).apply(init))
+
+
+operator fun MutableList<Step>.invoke(init: Init<StepBuilder>) {
+    StepBuilder(this::add).apply(init)
 }
 
-fun pipeline(init: Part<ConfigWrapper>): Part<Config> {
-    return {
-        ConfigWrapper(this).apply(init).config
+inline class StepBuilder(val addStep: (Step) -> Any?) {
+    fun get(resource: String, init: Init<Step.GetStep>) =
+        addStep(Step.GetStep(resource).apply(init))
+
+    fun put(resource: String, init: Init<Step.PutStep>) =
+        addStep(Step.PutStep(resource).apply(init))
+
+    fun task(name: String, init: Init<Step.TaskStep>) =
+        addStep(Step.TaskStep(name).apply(init))
+
+    fun aggregate(init: Init<StepBuilder>) {
+        val aggregateStep = Step.AggregateStep()
+        StepBuilder(aggregateStep.aggregate::add).apply(init)
+        addStep(aggregateStep)
     }
+
+    fun `do`(init: Init<StepBuilder>) {
+        val doStep = Step.DoStep()
+        StepBuilder(doStep.steps::add).apply(init)
+        addStep(doStep)
+    }
+
+    fun `try`(resource: String, init: Init<StepBuilder>) =
+        OneTimeStepBuilder("try") { addStep(Step.TryStep(it)) }.apply(init)
 }
 
-
-class ConfigWrapper(val config: Config) {
-    fun job(name: String, init: Part<Job>) {
-        val job = Job(name)
-        job.init()
-        config.jobs.add(job)
-    }
-
-    fun resource(name: String, type: String, init: Part<Resource>) {
-        val resource = Resource(name, type)
-        resource.init()
-        config.resources.add(resource)
+fun OneTimeStepBuilder(configName: String, addStep: (Step) -> Any?): StepBuilder {
+    var called: Boolean = false
+    return StepBuilder {
+        if (called) throw IllegalStateException("$configName may only contain at most one step")
+        called = true
+        addStep(it)
     }
 }
-
-fun Job.plan(init: Part<PlanWrapper>) {
-    PlanWrapper(this).init()
-}
-
-class PlanWrapper(val job: Job) {
-    fun get(resource: String, init: Part<Step.GetStep>): Step.GetStep {
-        val step = Step.GetStep(resource)
-        step.init()
-        job.plan.add(step)
-        return step
-    }
-
-    fun put(resource: String, init: Part<Step.PutStep>): Step.PutStep {
-        val step = Step.PutStep(resource)
-        step.init()
-        job.plan.add(step)
-        return step
-    }
-
-    fun task(name: String, init: Part<Step.TaskStep>): Step.TaskStep {
-        val step = Step.TaskStep(name)
-        step.init()
-        job.plan.add(step)
-        return step
-    }
-}
-

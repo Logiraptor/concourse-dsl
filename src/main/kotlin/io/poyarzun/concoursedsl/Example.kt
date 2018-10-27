@@ -1,8 +1,9 @@
 package io.poyarzun.concoursedsl
 
+import io.poyarzun.concoursedsl.domain.Pipeline
 import io.poyarzun.concoursedsl.dsl.*
 
-val customPipeline = pipeline {
+val customPipeline = Pipeline().apply {
     resource("non-prod", "cf") {
         source = mapOf("api" to "https://api.sys.dev.cf.io", "space" to "dev")
     }
@@ -11,12 +12,32 @@ val customPipeline = pipeline {
         source = mapOf("api" to "https://api.sys.cf.io", "space" to "dev")
     }
 
+    resourceType("email", "") {
+
+    }
+
     sharedTemplate("mailer")
     sharedTemplate("mint")
     sharedTemplate("third")
+
+    group("All") {
+        this@apply.jobs.forEach { job ->
+            jobs.add(job.name)
+        }
+
+        this@apply.resources.forEach { resource ->
+            resources.add(resource.name)
+        }
+    }
+
+    group("Mint") {
+        jobs.add("MINT Test & Staging Deploy")
+        jobs.add("MINT Prod Deploy")
+    }
+
 }
 
-private fun ConfigWrapper.sharedTemplate(name: String) {
+private fun Pipeline.sharedTemplate(name: String) {
     val sourceCodeResource = "$name-source-code"
 
     resource(sourceCodeResource, "git") {
@@ -48,6 +69,15 @@ private fun ConfigWrapper.sharedTemplate(name: String) {
             }
             put("prod") {
 
+            }
+            aggregate {
+                get(sourceCodeResource) {
+                    trigger = true
+                }
+
+                put("prod") {
+
+                }
             }
         }
     }

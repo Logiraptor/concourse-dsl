@@ -1,6 +1,7 @@
 import org.gradle.api.publish.maven.internal.publisher.MavenRemotePublisher
 import org.gradle.api.tasks.bundling.Jar
 import java.net.URI
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.3.0-rc-190"
@@ -36,7 +37,7 @@ dependencies {
 //
 //val sourcesJar by tasks.creating(Jar::class) {
 //    classifier = "sources"
-//    from() <- sourcesSets.all.main.java??
+//    from(sourceSets["main"].allSource)
 //}
 
 val sonatypePassword: String by project
@@ -66,4 +67,9 @@ publishing {
 
 signing {
     sign(publishing.publications["ProductionJar"])
+}
+
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    freeCompilerArgs = listOf("-XXLanguage:+InlineClasses")
 }

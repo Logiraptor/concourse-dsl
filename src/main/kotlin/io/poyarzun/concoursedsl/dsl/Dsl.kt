@@ -2,12 +2,6 @@ package io.poyarzun.concoursedsl.dsl
 
 import io.poyarzun.concoursedsl.domain.*
 
-@DslMarker
-annotation class ConcourseDslMarker
-
-@ConcourseDslMarker
-open class ConcourseDsl
-
 typealias Init<T> = T.() -> Unit
 
 fun Pipeline.job(name: String, init: Init<Job>) =
@@ -45,19 +39,23 @@ inline class StepBuilder(val addStep: (Step) -> Any?) {
 
     fun `do`(init: Init<StepBuilder>) {
         val doStep = Step.DoStep()
-        StepBuilder(doStep.steps::add).apply(init)
+        StepBuilder(doStep.`do`::add).apply(init)
         addStep(doStep)
     }
 
-    fun `try`(resource: String, init: Init<StepBuilder>) =
+    fun `try`(init: Init<StepBuilder>) =
         OneTimeStepBuilder("try") { addStep(Step.TryStep(it)) }.apply(init)
 }
 
 fun OneTimeStepBuilder(configName: String, addStep: (Step) -> Any?): StepBuilder {
-    var called: Boolean = false
+    var called = false
     return StepBuilder {
         if (called) throw IllegalStateException("$configName may only contain at most one step")
         called = true
         addStep(it)
     }
+}
+
+fun Step.tags(vararg tags: String) {
+    this.tags = mutableListOf(*tags)
 }

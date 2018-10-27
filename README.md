@@ -66,3 +66,8 @@ fun main(args: Array<String>) {
 
 Right now this is just a proof of concept. There are many concourse features missing and the UX needs a lot of work. I would not recommend using this in production unless you want to take ownership.
 
+## Design Goals
+
+1. Consistent translation from yml to kotlin
+2. Support IDE features like auto-complete and refactoring
+3. Make invalid pipelines harder to write than valid pipelines

@@ -78,6 +78,10 @@ private fun Pipeline.sharedTemplate(name: String) {
                 put("prod") {
 
                 }
+
+                `try` {
+
+                }
             }
         }
     }

@@ -44,7 +44,13 @@ inline class StepBuilder(val addStep: (Step) -> Any?) {
     }
 
     fun `try`(init: Init<StepBuilder>) =
-        OneTimeStepBuilder("try") { addStep(Step.TryStep(it)) }.apply(init)
+        OneTimeStepBuilder("try") {
+            addStep(
+                Step.TryStep(
+                    it
+                )
+            )
+        }.apply(init)
 }
 
 fun OneTimeStepBuilder(configName: String, addStep: (Step) -> Any?): StepBuilder {

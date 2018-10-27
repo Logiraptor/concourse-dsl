@@ -7,9 +7,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.poyarzun.concoursedsl.domain.Pipeline
 
-fun Pipeline.generateYML(): String {
+fun generateYML(pipeline: Pipeline): String {
     val mapper = ObjectMapper(YAMLFactory())
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
     mapper.registerModule(KotlinModule())
-    return mapper.writeValueAsString(this)
+    return mapper.writeValueAsString(pipeline)
 }

@@ -1,6 +1,6 @@
 package io.poyarzun.concoursedsl
 
-import io.poyarzun.concoursedsl.domain.Pipeline
+import io.poyarzun.concoursedsl.domain.*
 import io.poyarzun.concoursedsl.dsl.*
 
 val customPipeline = Pipeline().apply {
@@ -88,5 +88,5 @@ private fun Pipeline.sharedTemplate(name: String) {
 }
 
 fun main(args: Array<String>) {
-    println(customPipeline.generateYML())
+    println(generateYML(customPipeline))
 }

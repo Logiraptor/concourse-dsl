@@ -1,3 +1,16 @@
+
+# Chores
+
+## Add Dokka
+
+## Setup CI infrastructure
+
+## Improve developer experience
+
+## 100% Test Coverage
+
+# Features
+
 ## Type safe params / sources / etc
 
 ```kotlin
@@ -77,3 +90,6 @@ task("name") {
 
 ```
 
+## Better Group Syntax
+
+Not sure what to do here, but jobs.add("name") feels inconsistent with the rest of the api.

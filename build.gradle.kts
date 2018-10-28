@@ -3,17 +3,21 @@ import org.gradle.api.tasks.bundling.Jar
 import java.net.URI
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+
 plugins {
+    val dokkaVersion = "0.9.17"
+
     kotlin("jvm") version "1.3.0-rc-190"
     wrapper
     idea
     `java-library`
     `maven-publish`
     signing
+//    id("org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion")
 }
 
 group = "io.poyarzun"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.2"
 
 repositories {
     jcenter()
@@ -31,17 +35,17 @@ dependencies {
     testImplementation(kotlin("test-junit"))
 }
 
-//val javadoc by tasks
-//
-//val javadocJar by tasks.creating(Jar::class) {
-//    classifier = "javadoc"
-//    from(javadoc)
-//}
-//
-//val sourcesJar by tasks.creating(Jar::class) {
-//    classifier = "sources"
-//    from(sourceSets["main"].allSource)
-//}
+val javadoc by tasks
+
+val javadocJar by tasks.creating(Jar::class) {
+    classifier = "javadoc"
+    from(javadoc)
+}
+
+val sourcesJar by tasks.creating(Jar::class) {
+    classifier = "sources"
+    from(kotlin.sourceSets["main"].kotlin)
+}
 
 val sonatypePassword: String by project
 val sonatypeUsername: String by project
@@ -49,7 +53,33 @@ val sonatypeUsername: String by project
 publishing {
     publications {
         create("ProductionJar", MavenPublication::class.java) {
+
+            pom {
+                name.set("Concourse DSL")
+                description.set("A kotlin DSL for configuring Concourse pipelines")
+                url.set("https://github.com/Logiraptor/concourse-dsl")
+                licenses {
+                    license {
+                        name.set("MIT")
+                        url.set("https://opensource.org/licenses/MIT")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/Logiraptor/concourse-dsl")
+                }
+                developers {
+                    developer {
+                        id.set("poyarzun")
+                        name.set("Patrick Oyarzun")
+                        email.set("patrick@poyarzun.io")
+                    }
+                }
+            }
+
             from(components["java"])
+
+            artifact(sourcesJar)
+            artifact(javadocJar)
         }
     }
 

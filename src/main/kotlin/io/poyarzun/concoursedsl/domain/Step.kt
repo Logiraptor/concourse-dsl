@@ -2,7 +2,7 @@ package io.poyarzun.concoursedsl.domain
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-sealed class Step: StepHookReceiver {
+sealed class Step : StepHookReceiver {
     var tags: MutableList<String>? = null
     var timeout: String? = null
     var attempts: Int? = null
@@ -49,9 +49,9 @@ sealed class Step: StepHookReceiver {
         var outputMapping: Map<String, String?>? = null
     ) : Step()
 
-    data class AggregateStep(val aggregate: MutableList<Step> = ArrayList()): Step()
+    data class AggregateStep(val aggregate: MutableList<Step> = ArrayList()) : Step()
 
-    data class DoStep(val `do`: MutableList<Step> = ArrayList()): Step()
+    data class DoStep(val `do`: MutableList<Step> = ArrayList()) : Step()
 
-    data class TryStep(val `try`: Step): Step()
+    data class TryStep(val `try`: Step) : Step()
 }

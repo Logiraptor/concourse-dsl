@@ -3,6 +3,12 @@ package io.poyarzun.concoursedsl.dsl
 import io.poyarzun.concoursedsl.domain.*
 
 /**
+ * Shorthand for declaring a pipeline and configuring it with [init]
+ */
+fun pipeline(init: Init<Pipeline>) =
+    Pipeline().apply(init)
+
+/**
  * Declare a job named [name] in the pipeline and configure it with [init]
  *
  * @see Job

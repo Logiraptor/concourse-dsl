@@ -3,7 +3,7 @@ package io.poyarzun.concoursedsl
 import io.poyarzun.concoursedsl.domain.*
 import io.poyarzun.concoursedsl.dsl.*
 
-val customPipeline = Pipeline().apply {
+val customPipeline = pipeline {
     resource("non-prod", "cf") {
         source = mapOf("api" to "https://api.sys.dev.cf.io", "space" to "dev")
     }
@@ -21,11 +21,11 @@ val customPipeline = Pipeline().apply {
     sharedTemplate("third")
 
     group("All") {
-        this@apply.jobs.forEach { job ->
+        this@pipeline.jobs.forEach { job ->
             jobs.add(job.name)
         }
 
-        this@apply.resources.forEach { resource ->
+        this@pipeline.resources.forEach { resource ->
             resources.add(resource.name)
         }
     }

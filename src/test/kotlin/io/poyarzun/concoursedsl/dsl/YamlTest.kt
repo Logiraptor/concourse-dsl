@@ -78,9 +78,15 @@ class YamlTest {
 
                 disableManualTrigger = false
 
-                onSuccess = Step.GetStep("some-resource")
-                onFailure = Step.GetStep("some-other-resource")
-                onAbort  = Step.GetStep("yet-another-resource")
+                onSuccess {
+                    get("some-resource") {}
+                }
+                onFailure {
+                    get("some-other-resource") {}
+                }
+                onAbort {
+                    get("yet-another-resource") {}
+                }
             }
         }
 

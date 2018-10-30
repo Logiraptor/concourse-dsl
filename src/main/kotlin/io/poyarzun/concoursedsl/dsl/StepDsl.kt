@@ -1,12 +1,41 @@
 package io.poyarzun.concoursedsl.dsl
 
 import io.poyarzun.concoursedsl.domain.Step
+import io.poyarzun.concoursedsl.domain.StepHookReceiver
 
 fun Step.tags(vararg tags: String) {
     this.tags = mutableListOf(*tags)
 }
 
-inline class StepBuilder(val addStep: (Step) -> Any?) {
+fun StepHookReceiver.onSuccess(init: Init<StepBuilder>) {
+    StepBuilder {
+        this.onSuccess = it
+        null
+    }.apply(init)
+}
+
+fun StepHookReceiver.onFailure(init: Init<StepBuilder>) {
+    StepBuilder {
+        this.onFailure = it
+        null
+    }.apply(init)
+}
+
+fun StepHookReceiver.onAbort(init: Init<StepBuilder>) {
+    StepBuilder {
+        this.onAbort = it
+        null
+    }.apply(init)
+}
+
+fun StepHookReceiver.ensure(init: Init<StepBuilder>) {
+    StepBuilder {
+        this.ensure = it
+        null
+    }.apply(init)
+}
+
+class StepBuilder(val addStep: (Step) -> Any?) {
     fun get(resource: String, init: Init<Step.GetStep>) =
         addStep(Step.GetStep(resource).apply(init))
 
@@ -29,13 +58,7 @@ inline class StepBuilder(val addStep: (Step) -> Any?) {
     }
 
     fun `try`(init: Init<StepBuilder>) =
-        oneTimeStepBuilder("try") {
-            addStep(
-                Step.TryStep(
-                    it
-                )
-            )
-        }.apply(init)
+        oneTimeStepBuilder("try") { addStep(Step.TryStep(it)) }.apply(init)
 
     private fun oneTimeStepBuilder(configName: String, addStep: (Step) -> Any?): StepBuilder {
         var called = false

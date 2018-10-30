@@ -2,10 +2,19 @@ package io.poyarzun.concoursedsl.domain
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-sealed class Step {
+sealed class Step: StepHookReceiver {
     var tags: MutableList<String>? = null
     var timeout: String? = null
     var attempts: Int? = null
+
+    @JsonProperty("on_success")
+    override var onSuccess: Step? = null
+    @JsonProperty("on_failure")
+    override var onFailure: Step? = null
+    @JsonProperty("on_abort")
+    override var onAbort: Step? = null
+
+    override var ensure: Step? = null
 
     data class GetStep(
         val get: String,

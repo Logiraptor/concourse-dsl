@@ -50,28 +50,6 @@ resource<CloudFoundry>("Prod") {
 
 ```
 
-## Nice step hook syntax
-
-```kotlin
-
-job("Foo") {
-    plan {
-        get("sourceCode")
-        put("deployment") {
-        
-            onFailure {
-                put("Teams Resource")
-            }
-        }
-    }
-    
-    onSucceed {
-        put("Teams Resource")
-    }
-}
-
-```
-
 ## Require *either* file or config for a task definition
 
 ```kotlin

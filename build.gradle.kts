@@ -13,7 +13,6 @@ plugins {
     `java-library`
     `maven-publish`
     signing
-//    id("org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion")
 }
 
 group = "io.poyarzun"
@@ -21,7 +20,6 @@ version = "0.0.4"
 
 repositories {
     jcenter()
-    maven("https://dl.bintray.com/kotlin/kotlin-eap")
 }
 
 dependencies {
@@ -100,9 +98,4 @@ publishing {
 
 signing {
     sign(publishing.publications["ProductionJar"])
-}
-
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    freeCompilerArgs = listOf("-XXLanguage:+InlineClasses")
 }

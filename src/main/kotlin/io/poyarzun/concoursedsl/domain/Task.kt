@@ -1,9 +1,13 @@
 package io.poyarzun.concoursedsl.domain
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 data class Task(
     val platform: String,
     val run: RunConfig,
+    @JsonProperty("image_resource")
     var imageResource: Resource? = null,
+    @JsonProperty("rootfs_uri")
     var rootfsUri: String? = null,
     var inputs: MutableList<Input>? = null,
     var outputs: MutableList<Output>? = null,

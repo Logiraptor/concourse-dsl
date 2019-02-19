@@ -29,8 +29,16 @@ fun Pipeline.group(name: String, init: Init<Group>) =
  *
  * @see Resource
  */
-fun Pipeline.resource(name: String, type: String, init: Init<Resource>) =
-    resources.add(Resource(name, type).apply(init))
+fun Pipeline.resource(name: String, type: String, init: Init<Resource<Object>>) =
+    baseResource(name, type, ::mutableMapOf, init)
+
+/**
+ * Declare a resource named [name] of type [type] in the pipeline and configure it with [init]
+ *
+ * @see Resource
+ */
+fun <SourceProps> Pipeline.baseResource(name: String, type: String, sourcePropFactory: () -> SourceProps, init: Init<Resource<SourceProps>>) =
+        resources.add(Resource(name, type, sourcePropFactory()).apply(init) as Resource<Any>)
 
 /**
  * Declare a resource type named [name] of type [type] in the pipeline and configure it with [init]

@@ -25,7 +25,7 @@ class StepDslTest {
         }
 
         result.let { step ->
-            assertTrue(step is Step.GetStep)
+            assertTrue(step is Step.GetStep<*>)
             assertEquals("source-code", step.get)
 
             step.passed.let {
@@ -40,16 +40,15 @@ class StepDslTest {
     fun `put dsl configures basic put step properties`() {
         val result = testPlan {
             put("cf") {
-                params = mapOf("manifest" to "source-code/manifest.yml")
+                params = mutableMapOf("manifest" to "source-code/manifest.yml") as Object
             }
         }
 
         result.let { step ->
-            assertTrue(step is Step.PutStep)
+            assertTrue(step is Step.PutStep<*, *>)
             assertEquals("cf", step.put)
 
-            step.params.let {
-                assertTrue(it != null)
+            (step.params as Object).let {
                 assertEquals("source-code/manifest.yml", it["manifest"])
             }
         }

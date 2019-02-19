@@ -1,15 +1,29 @@
 package io.poyarzun.concoursedsl
 
-import io.poyarzun.concoursedsl.domain.*
+import io.poyarzun.concoursedsl.domain.Pipeline
+import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.dsl.*
+import io.poyarzun.concoursedsl.resources.gitResource
 
 val customPipeline = pipeline {
     resource("non-prod", "cf") {
-        source = mapOf("api" to "https://api.sys.dev.cf.io", "space" to "dev")
+        source {
+            put("api", "https://api.sys.dev.cf.io")
+            put("space", "dev")
+        }
     }
 
     resource("prod", "cf") {
-        source = mapOf("api" to "https://api.sys.cf.io", "space" to "dev")
+        source {
+            put("api", "https://api.sys.cf.io")
+            put("space", "dev")
+        }
+    }
+
+    gitResource("prod", "git@github.com:Logiraptor/concourse-dsl.git") {
+        source {
+            branch = "master"
+        }
     }
 
     resourceType("email", "") {
@@ -25,7 +39,7 @@ val customPipeline = pipeline {
             jobs.add(job.name)
         }
 
-        this@pipeline.resources.forEach { resource ->
+        this@pipeline.resources.forEach { resource: Resource<Any> ->
             resources.add(resource.name)
         }
     }
@@ -40,8 +54,10 @@ val customPipeline = pipeline {
 private fun Pipeline.sharedTemplate(name: String) {
     val sourceCodeResource = "$name-source-code"
 
-    resource(sourceCodeResource, "git") {
-        source = mapOf("uri" to "https://github.com/$name.git", "branch" to "master")
+    gitResource(sourceCodeResource, "https://github.com/$name.git") {
+        source {
+            branch = "master"
+        }
     }
 
     job("${name.toUpperCase()} Test & Staging Deploy") {

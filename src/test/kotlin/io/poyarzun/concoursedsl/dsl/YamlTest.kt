@@ -19,20 +19,20 @@ class YamlTest {
             }
 
             resource("concourse-dsl-source", "git") {
-                source = mapOf(
-                        "uri" to "git@github.com:Logiraptor/concourse-dsl",
-                        "private_key" to "((github-deploy-key))"
-                )
+                source {
+                    put("uri", "git@github.com:Logiraptor/concourse-dsl")
+                    put("private_key", "((github-deploy-key))")
+                }
                 checkEvery = "20m"
                 webhookToken = "totally-a-secret"
             }
 
             resource("results", "s3") {
-                source = mapOf(
-                        "bucket" to "results-bucket",
-                        "access_key" to "((aws_access_key))",
-                        "secret_key" to "((aws_secret_key))"
-                )
+                source {
+                    put("bucket", "results-bucket")
+                    put("access_key", "((aws_access_key))")
+                    put("secret_key", "((aws_secret_key))")
+                }
             }
 
             job("Test") {
@@ -66,7 +66,7 @@ class YamlTest {
                         )
                     }
                     put("results") {
-                        getParams = mapOf(
+                        getParams = mutableMapOf(
                                 "skip_download" to "true"
                         )
                     }
@@ -88,6 +88,8 @@ class YamlTest {
                     get("yet-another-resource") {}
                 }
             }
+
+            return@apply
         }
 
         val yaml = generateYML(pipeline)

@@ -3,6 +3,8 @@ package io.poyarzun.concoursedsl.dsl
 import io.poyarzun.concoursedsl.domain.Step
 import io.poyarzun.concoursedsl.domain.StepHookReceiver
 
+typealias Object = MutableMap<String, Any?>
+
 fun Step.tags(vararg tags: String) {
     this.tags = mutableListOf(*tags)
 }
@@ -36,14 +38,20 @@ fun StepHookReceiver.ensure(init: Init<StepBuilder>) {
 }
 
 class StepBuilder(val addStep: (Step) -> Any?) {
-    fun get(resource: String, init: Init<Step.GetStep>) =
-        addStep(Step.GetStep(resource).apply(init))
+    fun get(resource: String, init: Init<Step.GetStep<Object>>) =
+            getStep(resource, init)
 
-    fun put(resource: String, init: Init<Step.PutStep>) =
-        addStep(Step.PutStep(resource).apply(init))
+    fun put(resource: String, init: Init<Step.PutStep<Object, Object>>) =
+            putStep(resource, init)
+
+    fun <InProps> getStep(resource: String, init: Init<Step.GetStep<InProps>>) =
+            addStep(Step.GetStep<InProps>(resource).apply(init))
+
+    fun <InProps, OutProps> putStep(resource: String, init: Init<Step.PutStep<InProps, OutProps>>) =
+            addStep(Step.PutStep<InProps, OutProps>(resource).apply(init))
 
     fun task(name: String, init: Init<Step.TaskStep>) =
-        addStep(Step.TaskStep(name).apply(init))
+            addStep(Step.TaskStep(name).apply(init))
 
     fun aggregate(init: Init<StepBuilder>) {
         val aggregateStep = Step.AggregateStep()
@@ -58,7 +66,7 @@ class StepBuilder(val addStep: (Step) -> Any?) {
     }
 
     fun `try`(init: Init<StepBuilder>) =
-        oneTimeStepBuilder("try") { addStep(Step.TryStep(it)) }.apply(init)
+            oneTimeStepBuilder("try") { addStep(Step.TryStep(it)) }.apply(init)
 
     private fun oneTimeStepBuilder(configName: String, addStep: (Step) -> Any?): StepBuilder {
         var called = false

@@ -1,6 +1,7 @@
 package io.poyarzun.concoursedsl.dsl
 
 import io.poyarzun.concoursedsl.domain.Pipeline
+import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.domain.Step
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -44,17 +45,15 @@ class PipelineDslTest {
     fun `dsl configures basic resource properties`() {
         pipeline.apply {
             resource("source-code", "git") {
-                source = mapOf(
-                    "uri" to "ssh://git@github.com/team/project.git",
-                    "key" to "((private_key))"
-                )
+                source {
+                    put("uri", "ssh://git@github.com/team/project.git")
+                    put("key", "((private_key))")
+                }
             }
         }
 
-        pipeline.resources[0].apply {
+        (pipeline.resources[0] as Resource<Object>).apply {
             assertEquals("source-code", name)
-            val source = source
-            assertTrue(source != null)
             assertEquals("ssh://git@github.com/team/project.git", source["uri"])
         }
     }

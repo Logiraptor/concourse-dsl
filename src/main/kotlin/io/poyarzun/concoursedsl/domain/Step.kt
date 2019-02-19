@@ -16,21 +16,21 @@ sealed class Step : StepHookReceiver {
 
     override var ensure: Step? = null
 
-    data class GetStep(
+    data class GetStep<InProps>(
         val get: String,
         var resource: String? = null,
         var version: String? = null,
         var passed: List<String>? = null,
-        var params: Map<String, Any?>? = null,
+        var params: InProps? = null,
         var trigger: Boolean? = null
     ) : Step()
 
-    data class PutStep(
+    data class PutStep<InProps, OutProps>(
         val put: String,
         var resource: String? = null,
-        var params: Map<String, Any?>? = null,
+        var params: OutProps? = null,
         @JsonProperty("get_params")
-        var getParams: Map<String, Any?>? = null
+        var getParams: InProps? = null
     ) : Step()
 
     data class TaskStep(

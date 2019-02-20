@@ -1,10 +1,13 @@
 package io.poyarzun.concoursedsl.resources
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy
+import com.fasterxml.jackson.databind.annotation.JsonNaming
 import io.poyarzun.concoursedsl.domain.Pipeline
 import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.dsl.Init
 import io.poyarzun.concoursedsl.dsl.baseResource
 
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 class GitSourceProps(
         val uri: String,
         var branch: String? = null,
@@ -23,7 +26,9 @@ class GitSourceProps(
         var gitCryptKey: String? = null,
         var httpsTunnel: HttpProxy? = null
 ) {
+    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     class GitConfig(val name: String, val value: String)
+    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     class HttpProxy(
             val proxyHost: String,
             val proxyPort: String,

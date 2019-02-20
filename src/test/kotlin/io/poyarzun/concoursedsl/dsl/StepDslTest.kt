@@ -40,7 +40,9 @@ class StepDslTest {
     fun `put dsl configures basic put step properties`() {
         val result = testPlan {
             put("cf") {
-                params = mutableMapOf("manifest" to "source-code/manifest.yml") as Object
+                params {
+                    put("manifest", "source-code/manifest.yml")
+                }
             }
         }
 

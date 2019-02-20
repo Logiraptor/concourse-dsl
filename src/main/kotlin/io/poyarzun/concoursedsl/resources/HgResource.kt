@@ -20,4 +20,4 @@ class HgSourceProps(
 )
 
 fun Pipeline.hgResource(name: String, uri: String, init: Init<Resource<HgSourceProps>>) =
-        this.baseResource(name, "git", { HgSourceProps(uri) }, init)
+        this.baseResource(name, "git", HgSourceProps(uri), init)

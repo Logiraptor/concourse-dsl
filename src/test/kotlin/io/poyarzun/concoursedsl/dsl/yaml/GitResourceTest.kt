@@ -1,9 +1,7 @@
 package io.poyarzun.concoursedsl.dsl.yaml
 
-import io.poyarzun.concoursedsl.dsl.generateYML
-import io.poyarzun.concoursedsl.dsl.pipeline
-import io.poyarzun.concoursedsl.resources.GitSourceProps
-import io.poyarzun.concoursedsl.resources.gitResource
+import io.poyarzun.concoursedsl.dsl.*
+import io.poyarzun.concoursedsl.resources.*
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -11,7 +9,7 @@ class GitResourceTest {
     @Test
     fun testYaml() {
         val actualYaml = generateYML(pipeline {
-            gitResource("my-git-resource", "git@github.com:org/repo.git") {
+            val myRepo = gitResource("my-git-resource", "git@github.com:org/repo.git") {
                 source {
                     branch = "cool-branch"
                     gitConfig = mutableListOf(
@@ -25,11 +23,38 @@ class GitResourceTest {
                     )
                 }
             }
+
+            job("get-put-repo") {
+                plan {
+                    get(myRepo) {
+                        params {
+                            submodules = "all"
+                            depth = 10
+                        }
+                    }
+
+                    put(myRepo, "./output") {
+                        params {
+                            rebase = true
+                        }
+                    }
+                }
+            }
         })
 
         val expectedYaml = """
             ---
-            jobs: []
+            jobs:
+            - name: "get-put-repo"
+              plan:
+              - get: "my-git-resource"
+                params:
+                  depth: 10
+                  submodules: "all"
+              - put: "my-git-resource"
+                params:
+                  repository: "./output"
+                  rebase: true
             groups: []
             resources:
             - name: "my-git-resource"

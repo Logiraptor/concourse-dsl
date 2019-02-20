@@ -100,6 +100,7 @@ class YamlTest {
             - name: "Test"
               plan:
               - get: "concourse-dsl-source"
+                params: {}
                 trigger: true
               - task: "run-tests"
                 config:
@@ -121,6 +122,7 @@ class YamlTest {
                 output_mapping:
                   result: "output"
               - put: "results"
+                params: {}
                 get_params:
                   skip_download: "true"
               build_logs_to_retain: 1
@@ -130,10 +132,13 @@ class YamlTest {
               disable_manual_trigger: false
               on_success:
                 get: "some-resource"
+                params: {}
               on_failure:
                 get: "some-other-resource"
+                params: {}
               on_abort:
                 get: "yet-another-resource"
+                params: {}
             groups: []
             resources:
             - name: "concourse-dsl-source"

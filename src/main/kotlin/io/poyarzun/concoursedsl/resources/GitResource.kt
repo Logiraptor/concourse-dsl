@@ -72,4 +72,4 @@ fun StepBuilder.get(repo: Resource<GitSourceProps>, init: Init<Step.GetStep<GitI
         this.baseGet(repo.name, GitInProps(), init)
 
 fun StepBuilder.put(repo: Resource<GitSourceProps>, repository: String, init: Init<Step.PutStep<GitInProps, GitOutProps>>) =
-        this.basePut(repo.name, GitOutProps(repository), init)
+        this.basePut(repo.name, GitOutProps(repository), GitInProps(), init)

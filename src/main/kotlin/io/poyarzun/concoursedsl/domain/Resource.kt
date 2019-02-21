@@ -1,7 +1,6 @@
 package io.poyarzun.concoursedsl.domain
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.poyarzun.concoursedsl.dsl.Init
 
 data class Resource<SourceProps>(
     val name: String,
@@ -13,8 +12,4 @@ data class Resource<SourceProps>(
     var tags: MutableList<String>? = null,
     @JsonProperty("webhook_token")
     var webhookToken: String? = null
-) {
-    operator fun SourceProps.invoke(init: Init<SourceProps>) {
-        this.apply(init)
-    }
-}
+)

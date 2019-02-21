@@ -41,8 +41,8 @@ class StepBuilder(val addStep: (Step) -> Any?) {
     fun <InProps> baseGet(resource: String, inProps: InProps, init: Init<Step.GetStep<InProps>>) =
             addStep(Step.GetStep(resource, inProps).apply(init))
 
-    fun <InProps, OutProps> basePut(resource: String, outProps: OutProps, init: Init<Step.PutStep<InProps, OutProps>>) =
-            addStep(Step.PutStep<InProps, OutProps>(resource, outProps).apply(init))
+    fun <InProps, OutProps> basePut(resource: String, outProps: OutProps, inProps: InProps, init: Init<Step.PutStep<InProps, OutProps>>) =
+            addStep(Step.PutStep(resource, outProps, inProps).apply(init))
 
     fun task(name: String, init: Init<Step.TaskStep>) =
             addStep(Step.TaskStep(name).apply(init))
@@ -76,4 +76,4 @@ fun StepBuilder.get(resource: String, init: Init<Step.GetStep<Object>>) =
         baseGet(resource, mutableMapOf(), init)
 
 fun StepBuilder.put(resource: String, init: Init<Step.PutStep<Object, Object>>) =
-        basePut(resource, mutableMapOf(), init)
+        basePut(resource, mutableMapOf(), mutableMapOf(), init)

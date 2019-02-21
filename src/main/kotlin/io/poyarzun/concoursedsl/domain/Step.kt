@@ -24,23 +24,15 @@ sealed class Step : StepHookReceiver {
         var version: String? = null,
         var passed: List<String>? = null,
         var trigger: Boolean? = null
-    ) : Step() {
-        operator fun InProps.invoke(init: Init<InProps>) {
-            this.apply(init)
-        }
-    }
+    ) : Step()
 
     data class PutStep<InProps, OutProps>(
         val put: String,
         val params: OutProps,
-        var resource: String? = null,
         @JsonProperty("get_params")
-        var getParams: InProps? = null
-    ) : Step() {
-        operator fun OutProps.invoke(init: Init<OutProps>) {
-            this.apply(init)
-        }
-    }
+        var getParams: InProps,
+        var resource: String? = null
+    ) : Step()
 
     data class TaskStep(
         val task: String,

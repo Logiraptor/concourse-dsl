@@ -37,6 +37,10 @@ class GitResourceTest {
                         params {
                             rebase = true
                         }
+
+                        getParams {
+                            depth = 1
+                        }
                     }
                 }
             }
@@ -55,6 +59,8 @@ class GitResourceTest {
                 params:
                   repository: "./output"
                   rebase: true
+                get_params:
+                  depth: 1
             groups: []
             resources:
             - name: "my-git-resource"

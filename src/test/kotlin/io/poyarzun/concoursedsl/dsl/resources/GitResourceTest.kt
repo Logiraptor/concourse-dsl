@@ -1,4 +1,4 @@
-package io.poyarzun.concoursedsl.dsl.yaml
+package io.poyarzun.concoursedsl.dsl.resources
 
 import io.poyarzun.concoursedsl.dsl.*
 import io.poyarzun.concoursedsl.resources.*

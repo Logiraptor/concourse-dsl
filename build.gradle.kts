@@ -1,12 +1,7 @@
-import org.gradle.api.publish.maven.internal.publisher.MavenRemotePublisher
-import org.gradle.api.tasks.bundling.Jar
 import java.net.URI
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
-    val dokkaVersion = "0.9.17"
-
     kotlin("jvm") version "1.3.0"
     wrapper
     idea

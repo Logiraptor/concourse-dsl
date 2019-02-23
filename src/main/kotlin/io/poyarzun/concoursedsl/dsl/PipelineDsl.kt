@@ -3,47 +3,47 @@ package io.poyarzun.concoursedsl.dsl
 import io.poyarzun.concoursedsl.domain.*
 
 /**
- * Shorthand for declaring a pipeline and configuring it with [init]
+ * Shorthand for declaring a pipeline and configuring it with [configBlock]
  */
-fun pipeline(init: Init<Pipeline>) =
-    Pipeline().apply(init)
+fun pipeline(configBlock: ConfigBlock<Pipeline>) =
+    Pipeline().apply(configBlock)
 
 /**
- * Declare a job named [name] in the pipeline and configure it with [init]
+ * Declare a job named [name] in the pipeline and configure it with [configBlock]
  *
  * @see Job
  */
-fun Pipeline.job(name: String, init: Init<Job>) =
-    jobs.add(Job(name).apply(init))
+fun Pipeline.job(name: String, configBlock: ConfigBlock<Job>) =
+    jobs.add(Job(name).apply(configBlock))
 
 /**
- * Declare a group named [name] in the pipeline and configure it with [init]
+ * Declare a group named [name] in the pipeline and configure it with [configBlock]
  *
  * @see Group
  */
-fun Pipeline.group(name: String, init: Init<Group>) =
-    groups.add(Group(name).apply(init))
+fun Pipeline.group(name: String, configBlock: ConfigBlock<Group>) =
+    groups.add(Group(name).apply(configBlock))
 
 /**
- * Declare a resource named [name] of type [type] in the pipeline and configure it with [init]
+ * Declare a resource named [name] of type [type] in the pipeline and configure it with [configBlock]
  *
  * @see Resource
  */
-fun Pipeline.resource(name: String, type: String, init: Init<Resource<Object>>) =
-    baseResource(name, type, mutableMapOf(), init)
+fun Pipeline.resource(name: String, type: String, configBlock: ConfigBlock<Resource<Object>>) =
+    baseResource(name, type, mutableMapOf(), configBlock)
 
 /**
- * Declare a resource named [name] of type [type] in the pipeline and configure it with [init]
+ * Declare a resource named [name] of type [type] in the pipeline and configure it with [configBlock]
  *
  * @see Resource
  */
-fun <SourceProps> Pipeline.baseResource(name: String, type: String, sourceProps: SourceProps, init: Init<Resource<SourceProps>>) =
-        (Resource(name, type, sourceProps).apply(init)).also { resources.add(it as Resource<Any>) }
+fun <SourceProps> Pipeline.baseResource(name: String, type: String, sourceProps: SourceProps, configBlock: ConfigBlock<Resource<SourceProps>>) =
+        (Resource(name, type, sourceProps).apply(configBlock)).also { resources.add(it as Resource<Any>) }
 
 /**
- * Declare a resource type named [name] of type [type] in the pipeline and configure it with [init]
+ * Declare a resource type named [name] of type [type] in the pipeline and configure it with [configBlock]
  *
  * @see ResourceType
  */
-fun Pipeline.resourceType(name: String, type: String, init: Init<ResourceType>) =
-    resourceTypes.add(ResourceType(name, type).apply(init))
+fun Pipeline.resourceType(name: String, type: String, configBlock: ConfigBlock<ResourceType>) =
+    resourceTypes.add(ResourceType(name, type).apply(configBlock))

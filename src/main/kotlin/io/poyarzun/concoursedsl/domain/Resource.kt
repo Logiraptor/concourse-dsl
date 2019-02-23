@@ -2,10 +2,10 @@ package io.poyarzun.concoursedsl.domain
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class Resource<SourceProps>(
+data class Resource<SourceParams>(
     val name: String,
     val type: String,
-    val source: SourceProps,
+    val source: SourceParams,
     var version: Map<String, Any?>? = null,
     @JsonProperty("check_every")
     var checkEvery: String? = null,

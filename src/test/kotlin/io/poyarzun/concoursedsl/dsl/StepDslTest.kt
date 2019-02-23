@@ -7,12 +7,12 @@ import kotlin.test.assertTrue
 
 class StepDslTest {
 
-    private fun testPlan(init: Init<StepBuilder>): Step {
+    private fun testPlan(configBlock: ConfigBlock<StepBuilder>): Step {
         var step: Step? = null
         StepBuilder {
             step = it
             null
-        }.apply(init)
+        }.apply(configBlock)
         return step!!
     }
 

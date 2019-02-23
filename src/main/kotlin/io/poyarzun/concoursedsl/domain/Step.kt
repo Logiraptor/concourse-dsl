@@ -1,7 +1,6 @@
 package io.poyarzun.concoursedsl.domain
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.poyarzun.concoursedsl.dsl.Init
 
 sealed class Step : StepHookReceiver {
     var tags: MutableList<String>? = null
@@ -17,20 +16,20 @@ sealed class Step : StepHookReceiver {
 
     override var ensure: Step? = null
 
-    data class GetStep<InProps>(
+    data class GetStep<GetParams>(
         val get: String,
-        var params: InProps,
+        var params: GetParams,
         var resource: String? = null,
         var version: String? = null,
         var passed: List<String>? = null,
         var trigger: Boolean? = null
     ) : Step()
 
-    data class PutStep<InProps, OutProps>(
+    data class PutStep<GetParams, PutParams>(
         val put: String,
-        val params: OutProps,
+        val params: PutParams,
         @JsonProperty("get_params")
-        var getParams: InProps,
+        var getParams: GetParams,
         var resource: String? = null
     ) : Step()
 

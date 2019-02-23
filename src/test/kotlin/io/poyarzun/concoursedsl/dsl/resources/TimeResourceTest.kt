@@ -19,9 +19,9 @@ class TimeResourceTest {
 
             job("get-put") {
                 plan {
-                    get(myTime) {}
+                    get(myTime)
 
-                    put(myTime) {}
+                    put(myTime)
                 }
             }
         })

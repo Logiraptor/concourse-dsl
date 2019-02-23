@@ -4,22 +4,22 @@ import io.poyarzun.concoursedsl.domain.Job
 import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.domain.Step
 
-fun Job.plan(init: Init<StepBuilder>) {
-    StepBuilder(this.plan::add).apply(init)
+fun Job.plan(configBlock: ConfigBlock<StepBuilder>) {
+    StepBuilder(this.plan::add).apply(configBlock)
 }
 
-fun <SourceProps> Resource<SourceProps>.source(init: Init<SourceProps>) {
-    this.source.apply(init)
+fun <SourceProps> Resource<SourceProps>.source(configBlock: ConfigBlock<SourceProps>) {
+    this.source.apply(configBlock)
 }
 
-fun <InProps> Step.GetStep<InProps>.params(init: Init<InProps>) {
-    this.params.apply(init)
+fun <InProps> Step.GetStep<InProps>.params(configBlock: ConfigBlock<InProps>) {
+    this.params.apply(configBlock)
 }
 
-fun <InProps, OutProps> Step.PutStep<InProps, OutProps>.params(init: Init<OutProps>) {
-    this.params.apply(init)
+fun <InProps, OutProps> Step.PutStep<InProps, OutProps>.params(configBlock: ConfigBlock<OutProps>) {
+    this.params.apply(configBlock)
 }
 
-fun <InProps, OutProps> Step.PutStep<InProps, OutProps>.getParams(init: Init<InProps>) {
-    this.getParams.apply(init)
+fun <InProps, OutProps> Step.PutStep<InProps, OutProps>.getParams(configBlock: ConfigBlock<InProps>) {
+    this.getParams.apply(configBlock)
 }

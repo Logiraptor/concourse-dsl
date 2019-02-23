@@ -9,58 +9,58 @@ fun Step.tags(vararg tags: String) {
     this.tags = mutableListOf(*tags)
 }
 
-fun StepHookReceiver.onSuccess(init: Init<StepBuilder>) {
+fun StepHookReceiver.onSuccess(configBlock: ConfigBlock<StepBuilder>) {
     StepBuilder {
         this.onSuccess = it
         null
-    }.apply(init)
+    }.apply(configBlock)
 }
 
-fun StepHookReceiver.onFailure(init: Init<StepBuilder>) {
+fun StepHookReceiver.onFailure(configBlock: ConfigBlock<StepBuilder>) {
     StepBuilder {
         this.onFailure = it
         null
-    }.apply(init)
+    }.apply(configBlock)
 }
 
-fun StepHookReceiver.onAbort(init: Init<StepBuilder>) {
+fun StepHookReceiver.onAbort(configBlock: ConfigBlock<StepBuilder>) {
     StepBuilder {
         this.onAbort = it
         null
-    }.apply(init)
+    }.apply(configBlock)
 }
 
-fun StepHookReceiver.ensure(init: Init<StepBuilder>) {
+fun StepHookReceiver.ensure(configBlock: ConfigBlock<StepBuilder>) {
     StepBuilder {
         this.ensure = it
         null
-    }.apply(init)
+    }.apply(configBlock)
 }
 
 class StepBuilder(val addStep: (Step) -> Any?) {
-    fun <InProps> baseGet(resource: String, inProps: InProps, init: Init<Step.GetStep<InProps>>) =
-            addStep(Step.GetStep(resource, inProps).apply(init))
+    fun <InProps> baseGet(resource: String, inProps: InProps, configBlock: ConfigBlock<Step.GetStep<InProps>>) =
+            addStep(Step.GetStep(resource, inProps).apply(configBlock))
 
-    fun <InProps, OutProps> basePut(resource: String, outProps: OutProps, inProps: InProps, init: Init<Step.PutStep<InProps, OutProps>>) =
-            addStep(Step.PutStep(resource, outProps, inProps).apply(init))
+    fun <InProps, OutProps> basePut(resource: String, outProps: OutProps, inProps: InProps, configBlock: ConfigBlock<Step.PutStep<InProps, OutProps>>) =
+            addStep(Step.PutStep(resource, outProps, inProps).apply(configBlock))
 
-    fun task(name: String, init: Init<Step.TaskStep>) =
-            addStep(Step.TaskStep(name).apply(init))
+    fun task(name: String, configBlock: ConfigBlock<Step.TaskStep>) =
+            addStep(Step.TaskStep(name).apply(configBlock))
 
-    fun aggregate(init: Init<StepBuilder>) {
+    fun aggregate(configBlock: ConfigBlock<StepBuilder>) {
         val aggregateStep = Step.AggregateStep()
-        StepBuilder(aggregateStep.aggregate::add).apply(init)
+        StepBuilder(aggregateStep.aggregate::add).apply(configBlock)
         addStep(aggregateStep)
     }
 
-    fun `do`(init: Init<StepBuilder>) {
+    fun `do`(configBlock: ConfigBlock<StepBuilder>) {
         val doStep = Step.DoStep()
-        StepBuilder(doStep.`do`::add).apply(init)
+        StepBuilder(doStep.`do`::add).apply(configBlock)
         addStep(doStep)
     }
 
-    fun `try`(init: Init<StepBuilder>) =
-            oneTimeStepBuilder("try") { addStep(Step.TryStep(it)) }.apply(init)
+    fun `try`(configBlock: ConfigBlock<StepBuilder>) =
+            oneTimeStepBuilder("try") { addStep(Step.TryStep(it)) }.apply(configBlock)
 
     private fun oneTimeStepBuilder(configName: String, addStep: (Step) -> Any?): StepBuilder {
         var called = false
@@ -72,8 +72,8 @@ class StepBuilder(val addStep: (Step) -> Any?) {
     }
 }
 
-fun StepBuilder.get(resource: String, init: Init<Step.GetStep<Object>>) =
-        baseGet(resource, mutableMapOf(), init)
+fun StepBuilder.get(resource: String, configBlock: ConfigBlock<Step.GetStep<Object>>) =
+        baseGet(resource, mutableMapOf(), configBlock)
 
-fun StepBuilder.put(resource: String, init: Init<Step.PutStep<Object, Object>>) =
-        basePut(resource, mutableMapOf(), mutableMapOf(), init)
+fun StepBuilder.put(resource: String, configBlock: ConfigBlock<Step.PutStep<Object, Object>>) =
+        basePut(resource, mutableMapOf(), mutableMapOf(), configBlock)

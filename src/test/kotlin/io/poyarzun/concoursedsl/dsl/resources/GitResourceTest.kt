@@ -13,9 +13,9 @@ class GitResourceTest {
                 source {
                     branch = "cool-branch"
                     gitConfig = mutableListOf(
-                            GitSourceProps.GitConfig("custom-git", "custom-git-value")
+                            Git.Config("custom-git", "custom-git-value")
                     )
-                    httpsTunnel = GitSourceProps.HttpProxy(
+                    httpsTunnel = Git.HttpProxy(
                             proxyHost = "proxy.org",
                             proxyPort = "8080",
                             proxyUser = "admin",

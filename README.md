@@ -23,7 +23,7 @@ val services = mapOf(
     "third" to "github.com/third.git"
 )
 
-val customPipeline = Pipeline().apply {
+val customPipeline = pipeline {
     for ((name, repo) in services) {
         resource(name, type = "git") {
             source = mapOf("uri" to repo, "branch" to "master")

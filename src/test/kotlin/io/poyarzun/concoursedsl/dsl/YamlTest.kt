@@ -1,15 +1,15 @@
 package io.poyarzun.concoursedsl.dsl
 
-import io.poyarzun.concoursedsl.domain.Pipeline
-import io.poyarzun.concoursedsl.domain.Step
 import io.poyarzun.concoursedsl.domain.Task
+import io.poyarzun.concoursedsl.resources.get
+import io.poyarzun.concoursedsl.resources.gitResource
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class YamlTest {
     @Test
     fun testBasicPipelineYamlUsesSnakeCase() {
-        val pipeline = Pipeline().apply {
+        val pipeline = pipeline {
             resourceType("rss", "docker-image") {
                 source = mapOf(
                         "repository" to "suhlig/concourse-rss-resource",
@@ -18,10 +18,9 @@ class YamlTest {
                 checkEvery = "10m"
             }
 
-            resource("concourse-dsl-source", "git") {
+            val sourceCode = gitResource("concourse-dsl-source", "git@github.com:Logiraptor/concourse-dsl") {
                 source {
-                    put("uri", "git@github.com:Logiraptor/concourse-dsl")
-                    put("private_key", "((github-deploy-key))")
+                    privateKey = "((github-deploy-key))"
                 }
                 checkEvery = "20m"
                 webhookToken = "totally-a-secret"
@@ -37,7 +36,7 @@ class YamlTest {
 
             job("Test") {
                 plan {
-                    get("concourse-dsl-source") {
+                    get(sourceCode) {
                         trigger = true
                     }
                     task("run-tests") {
@@ -88,8 +87,6 @@ class YamlTest {
                     get("yet-another-resource") {}
                 }
             }
-
-            return@apply
         }
 
         val yaml = generateYML(pipeline)

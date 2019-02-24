@@ -3,11 +3,11 @@ package io.poyarzun.concoursedsl.dsl
 import io.poyarzun.concoursedsl.domain.Step
 import io.poyarzun.concoursedsl.domain.StepHookReceiver
 
-typealias Object = MutableMap<String, Any?>
+typealias Source = MutableMap<String, Any?>
+typealias Params = MutableMap<String, Any?>
+typealias Version = MutableMap<String, String>
 
-fun Step.tags(vararg tags: String) {
-    this.tags = mutableListOf(*tags)
-}
+typealias Tags = MutableList<String>
 
 fun StepHookReceiver.onSuccess(configBlock: ConfigBlock<StepBuilder>) {
     StepBuilder {
@@ -38,10 +38,10 @@ fun StepHookReceiver.ensure(configBlock: ConfigBlock<StepBuilder>) {
 }
 
 class StepBuilder(val addStep: (Step) -> Any?) {
-    fun <InProps> baseGet(resource: String, inProps: InProps, configBlock: ConfigBlock<Step.GetStep<InProps>>) =
+    fun <InProps: Any> baseGet(resource: String, inProps: InProps, configBlock: ConfigBlock<Step.GetStep<InProps>>) =
             addStep(Step.GetStep(resource, inProps).apply(configBlock))
 
-    fun <InProps, OutProps> basePut(resource: String, outProps: OutProps, inProps: InProps, configBlock: ConfigBlock<Step.PutStep<InProps, OutProps>>) =
+    fun <InProps: Any, OutProps: Any> basePut(resource: String, outProps: OutProps, inProps: InProps, configBlock: ConfigBlock<Step.PutStep<InProps, OutProps>>) =
             addStep(Step.PutStep(resource, outProps, inProps).apply(configBlock))
 
     fun task(name: String, configBlock: ConfigBlock<Step.TaskStep>) =
@@ -72,8 +72,8 @@ class StepBuilder(val addStep: (Step) -> Any?) {
     }
 }
 
-fun StepBuilder.get(resource: String, configBlock: ConfigBlock<Step.GetStep<Object>>) =
+fun StepBuilder.get(resource: String, configBlock: ConfigBlock<Step.GetStep<Params>>) =
         baseGet(resource, mutableMapOf(), configBlock)
 
-fun StepBuilder.put(resource: String, configBlock: ConfigBlock<Step.PutStep<Object, Object>>) =
+fun StepBuilder.put(resource: String, configBlock: ConfigBlock<Step.PutStep<Params, Params>>) =
         basePut(resource, mutableMapOf(), mutableMapOf(), configBlock)

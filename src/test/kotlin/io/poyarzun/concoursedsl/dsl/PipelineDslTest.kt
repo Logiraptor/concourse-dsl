@@ -28,7 +28,9 @@ class PipelineDslTest {
     fun `dsl configures basic resource type properties`() {
         pipeline.apply {
             resourceType("email", "docker-image") {
-                source = mapOf("image" to "somebody/email")
+                source {
+                    put("image", "somebody/email")
+                }
             }
         }
 
@@ -52,7 +54,7 @@ class PipelineDslTest {
             }
         }
 
-        (pipeline.resources[0] as Resource<Object>).apply {
+        (pipeline.resources[0] as Resource<Source>).apply {
             assertEquals("source-code", name)
             assertEquals("ssh://git@github.com/team/project.git", source["uri"])
         }

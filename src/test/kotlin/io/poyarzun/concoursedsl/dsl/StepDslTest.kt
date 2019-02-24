@@ -20,7 +20,10 @@ class StepDslTest {
     fun `get dsl configures basic get step properties`() {
         val result = testPlan {
             get("source-code") {
-                passed = listOf("Unit Tests", "QA Deployment")
+                passed {
+                    add("Unit Tests")
+                    add("QA Deployment")
+                }
             }
         }
 
@@ -50,7 +53,7 @@ class StepDslTest {
             assertTrue(step is Step.PutStep<*, *>)
             assertEquals("cf", step.put)
 
-            (step.params as Object).let {
+            (step.params as Params).let {
                 assertEquals("source-code/manifest.yml", it["manifest"])
             }
         }

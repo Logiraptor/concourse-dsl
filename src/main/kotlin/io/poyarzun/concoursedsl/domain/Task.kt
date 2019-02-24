@@ -1,18 +1,23 @@
 package io.poyarzun.concoursedsl.domain
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.PropertyNamingStrategy
+import com.fasterxml.jackson.databind.annotation.JsonNaming
+import io.poyarzun.concoursedsl.dsl.Params
+import io.poyarzun.concoursedsl.dsl.Source
+import io.poyarzun.concoursedsl.dsl.Version
 
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 data class Task(
     val platform: String,
     val run: RunConfig,
-    @JsonProperty("image_resource")
     var imageResource: Resource? = null,
-    @JsonProperty("rootfs_uri")
     var rootfsUri: String? = null,
-    var inputs: MutableList<Input>? = null,
-    var outputs: MutableList<Output>? = null,
-    var caches: MutableList<Cache>? = null,
-    var params: Map<String, String>? = null
+    val inputs: MutableList<Input> = mutableListOf(),
+    val outputs: MutableList<Output> = mutableListOf(),
+    val caches: MutableList<Cache> = mutableListOf(),
+    val params: Params = mutableMapOf()
 ) {
     data class RunConfig(
         val path: String,
@@ -21,11 +26,12 @@ data class Task(
         var user: String? = null
     )
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     data class Resource(
         val type: String,
-        val source: Map<String, Any?>,
-        var params: Map<String, Any?>? = null,
-        var version: Map<String, Any?>? = null
+        val source: Source = mutableMapOf(),
+        var params: Params = mutableMapOf(),
+        var version: Version = mutableMapOf()
     )
 
     data class Input(

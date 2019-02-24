@@ -78,7 +78,9 @@ private fun Pipeline.sharedTemplate(name: String) {
         plan {
             get(sourceCodeResource) {
                 trigger = false
-                passed = listOf("${name.toUpperCase()} Test & Staging Deploy")
+                passed {
+                    add("${name.toUpperCase()} Test & Staging Deploy")
+                }
             }
             task("build") {
                 file = "tasks/build.yml"

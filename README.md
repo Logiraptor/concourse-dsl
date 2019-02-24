@@ -67,3 +67,10 @@ Right now this is just a proof of concept. There are many concourse features mis
 1. Consistent translation from Kotlin to YAML
 2. Support IDE features like auto-complete and refactoring
 3. Make invalid pipelines harder to write than valid pipelines
+
+## Converting your pipeline to kotlin
+
+Generally there are rules for how code is converted to the DSL.
+
+1. Yaml objects and arrays become kotlin lambdas
+2. Yaml key: value pairs become kotlin property assignments

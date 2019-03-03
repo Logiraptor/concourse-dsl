@@ -1,5 +1,6 @@
 import java.net.URI
-
+import org.jetbrains.kotlin.noarg.gradle.NoArgExtension
+import org.gradle.jvm.tasks.Jar
 
 plugins {
     kotlin("jvm") version "1.3.0"
@@ -8,10 +9,16 @@ plugins {
     `java-library`
     `maven-publish`
     signing
+    application
+    id("org.jetbrains.kotlin.plugin.noarg") version "1.3.31"
+}
+
+configure<NoArgExtension> {
+    annotation("io.poyarzun.concoursedsl.domain.NoArg")
 }
 
 group = "io.poyarzun"
-version = "0.2.0"
+version = "0.3.0"
 
 repositories {
     jcenter()
@@ -22,6 +29,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.9.5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.5")
+    implementation("com.squareup:kotlinpoet:1.0.1")
 
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))
@@ -93,3 +101,25 @@ publishing {
 signing {
     sign(publishing.publications["ProductionJar"])
 }
+
+application {
+    mainClassName = "io.poyarzun.concoursedsl.printer.PrinterKt"
+}
+
+val fatJar = task("fatJar", type = Jar::class) {
+    baseName = "${project.name}-fat"
+    manifest {
+        attributes["Implementation-Title"] = "Gradle Jar File Example"
+        attributes["Implementation-Version"] = version
+        attributes["Main-Class"] = "io.poyarzun.concoursedsl.printer.PrinterKt"
+    }
+    from(configurations.runtime.map({ if (it.isDirectory) it else zipTree(it) }))
+    with(tasks["jar"] as CopySpec)
+}
+
+tasks {
+    "build" {
+        dependsOn(fatJar)
+    }
+}
+

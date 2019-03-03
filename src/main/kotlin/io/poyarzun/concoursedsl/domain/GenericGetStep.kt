@@ -3,7 +3,8 @@ package io.poyarzun.concoursedsl.domain
 import io.poyarzun.concoursedsl.dsl.ConfigBlock
 import io.poyarzun.concoursedsl.dsl.DslMap
 
-class GenericGetStep(name: String) : Step.GetStep<Params>(name) {
+@NoArg
+class GenericGetStep(get: String) : Step.GetStep<Params>(get) {
     override val params: Params = DslMap.empty()
 }
 

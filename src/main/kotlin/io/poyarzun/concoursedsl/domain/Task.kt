@@ -2,17 +2,17 @@ package io.poyarzun.concoursedsl.domain
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import io.poyarzun.concoursedsl.dsl.ConfigBlock
-import io.poyarzun.concoursedsl.dsl.DslList
-import io.poyarzun.concoursedsl.dsl.DslMap
-import io.poyarzun.concoursedsl.dsl.DslObject
+import io.poyarzun.concoursedsl.dsl.*
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 data class Task(val platform: String) {
 
+    @JsonDeserialize(using = RunConfigDslObjectDeserializer::class)
     val run = DslObject.from(::RunConfig)
+    @JsonDeserialize(using = ResourceDslObjectDeserializer::class)
     val imageResource = DslObject.from(::Resource)
     var rootfsUri: String? = null
     val inputs = DslList.empty<Input>()

@@ -1,15 +1,15 @@
 package io.poyarzun.concoursedsl.domain
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import io.poyarzun.concoursedsl.dsl.ConfigBlock
-import io.poyarzun.concoursedsl.dsl.DslList
-import io.poyarzun.concoursedsl.dsl.DslMap
-import io.poyarzun.concoursedsl.dsl.DslObject
+import io.poyarzun.concoursedsl.dsl.*
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonDeserialize(using = StepDeserializer::class)
 sealed class Step {
     val tags: Tags = DslList.empty()
     var timeout: String? = null
@@ -20,8 +20,10 @@ sealed class Step {
     var onAbort: Step? = null
     var ensure: Step? = null
 
+    @NoArg
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonDeserialize(using = JsonDeserializer.None::class)
     abstract class GetStep<Params : Any>(val get: String) : Step() {
         abstract val params: Params
         var resource: String? = null
@@ -30,8 +32,10 @@ sealed class Step {
         var trigger: Boolean? = null
     }
 
+    @NoArg
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonDeserialize(using = JsonDeserializer.None::class)
     abstract class PutStep<GetParams : Any, PutParams : Any>(val put: String) : Step() {
         abstract val params: PutParams
         abstract val getParams: GetParams
@@ -40,11 +44,13 @@ sealed class Step {
 
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonDeserialize(using = JsonDeserializer.None::class)
     data class TaskStep(val task: String) : Step() {
         val inputMapping = DslMap.empty<String, String>()
         val outputMapping = DslMap.empty<String, String>()
 
         // TODO: At most one of these is required
+        @JsonDeserialize(using = TaskDslObjectDeserializer::class)
         var config = DslObject.from(::Task)
         var file: String? = null
 
@@ -53,10 +59,13 @@ sealed class Step {
         var image: String? = null
     }
 
+    @JsonDeserialize(using = JsonDeserializer.None::class)
     data class AggregateStep(val aggregate: DslList<Step> = DslList.empty()) : Step()
 
+    @JsonDeserialize(using = JsonDeserializer.None::class)
     data class DoStep(val `do`: DslList<Step> = DslList.empty()) : Step()
 
+    @JsonDeserialize(using = JsonDeserializer.None::class)
     data class TryStep(val `try`: Step) : Step()
 }
 

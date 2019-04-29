@@ -1,7 +1,6 @@
-package io.poyarzun.concoursedsl.dsl.resources
+package io.poyarzun.concoursedsl.resources
 
 import io.poyarzun.concoursedsl.dsl.*
-import io.poyarzun.concoursedsl.resources.*
 import org.junit.Test
 import kotlin.test.assertEquals
 

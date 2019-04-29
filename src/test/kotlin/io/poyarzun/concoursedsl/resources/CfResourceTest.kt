@@ -1,9 +1,6 @@
-package io.poyarzun.concoursedsl.dsl.resources
+package io.poyarzun.concoursedsl.resources
 import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.dsl.*
-import io.poyarzun.concoursedsl.resources.Cf
-import io.poyarzun.concoursedsl.resources.cfResource
-import io.poyarzun.concoursedsl.resources.put
 import org.junit.Test
 import kotlin.test.assertEquals
 

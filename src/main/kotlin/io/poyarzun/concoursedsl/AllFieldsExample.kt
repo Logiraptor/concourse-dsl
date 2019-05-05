@@ -152,8 +152,8 @@ private fun StepBuilder.exhaustiveSteps(recurse: Boolean = false) {
             put("input-mapping-key2", "input-mapping-value2")
         }
 
-        config("platform-name", "path-value") {
-            run {
+        config("platform-name") {
+            run("path-value") {
                 args {
                     add("arg-value1")
                     add("arg-value2")

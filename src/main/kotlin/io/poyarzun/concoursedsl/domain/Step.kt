@@ -3,12 +3,13 @@ package io.poyarzun.concoursedsl.domain
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
+import io.poyarzun.concoursedsl.dsl.DslList
 import io.poyarzun.concoursedsl.dsl.Tags
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 sealed class Step : StepHookReceiver {
-    val tags: Tags = mutableListOf()
+    val tags: Tags = DslList.empty()
     var timeout: String? = null
     var attempts: Int? = null
 

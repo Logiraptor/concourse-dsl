@@ -3,11 +3,11 @@ package io.poyarzun.concoursedsl.dsl
 import io.poyarzun.concoursedsl.domain.Step
 import io.poyarzun.concoursedsl.domain.StepHookReceiver
 
-typealias Source = MutableMap<String, Any?>
-typealias Params = MutableMap<String, Any?>
-typealias Version = MutableMap<String, String>
+typealias Source = DslMap<String, Any?>
+typealias Params = DslMap<String, Any?>
+typealias Version = DslMap<String, String>
 
-typealias Tags = MutableList<String>
+typealias Tags = DslList<String>
 
 fun StepHookReceiver.onSuccess(configBlock: ConfigBlock<StepBuilder>) {
     StepBuilder {
@@ -73,7 +73,7 @@ class StepBuilder(val addStep: (Step) -> Any?) {
 }
 
 fun StepBuilder.get(resource: String, configBlock: ConfigBlock<Step.GetStep<Params>>) =
-        baseGet(resource, mutableMapOf(), configBlock)
+        baseGet(resource, DslMap.empty(), configBlock)
 
 fun StepBuilder.put(resource: String, configBlock: ConfigBlock<Step.PutStep<Params, Params>>) =
-        basePut(resource, mutableMapOf(), mutableMapOf(), configBlock)
+        basePut(resource, DslMap.empty(), DslMap.empty(), configBlock)

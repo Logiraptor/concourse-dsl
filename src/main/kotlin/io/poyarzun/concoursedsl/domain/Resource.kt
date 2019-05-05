@@ -3,6 +3,8 @@ package io.poyarzun.concoursedsl.domain
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
+import io.poyarzun.concoursedsl.dsl.DslList
+import io.poyarzun.concoursedsl.dsl.DslMap
 import io.poyarzun.concoursedsl.dsl.Tags
 import io.poyarzun.concoursedsl.dsl.Version
 
@@ -12,8 +14,8 @@ data class Resource<Source : Any>(
         val name: String,
         val type: String,
         val source: Source,
-        val tags: Tags = mutableListOf(),
-        val version: Version = mutableMapOf(),
+        val tags: Tags = DslList.empty(),
+        val version: Version = DslMap.empty(),
         var checkEvery: String = "",
         var webhookToken: String = ""
 )

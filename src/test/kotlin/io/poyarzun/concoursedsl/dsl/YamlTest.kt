@@ -1,6 +1,5 @@
 package io.poyarzun.concoursedsl.dsl
 
-import io.poyarzun.concoursedsl.domain.Task
 import io.poyarzun.concoursedsl.resources.get
 import io.poyarzun.concoursedsl.resources.gitResource
 import org.junit.Test
@@ -46,23 +45,21 @@ class YamlTest {
                         outputMapping {
                             put("result", "output")
                         }
-                        config("linux", "/bin/sh") {
+                        config("linux") {
                             rootfsUri = "not-a-real-value"
                             imageResource("docker-image") {
                                 source {
                                     put("resource", "maven")
                                 }
                             }
-                            run {
-                                args {
-                                    add("-c")
-                                    add("""
+                            run("/bin/sh") {
+                                args("-c", """
                                         cd source-code
                                         ./gradlew test
                                         mkdir result
                                         echo "OK" > result/result.out
-                                    """.trimIndent())
-                                }
+                                    """.trimIndent()
+                                )
                                 input("concourse-dsl-source") {}
                             }
                         }
@@ -75,7 +72,7 @@ class YamlTest {
                 }
 
                 buildLogsToRetain = 1
-                serialGroups = mutableListOf("unique-jobs")
+                serialGroups("unique-jobs")
                 maxInFlight = 1
 
                 disableManualTrigger = false

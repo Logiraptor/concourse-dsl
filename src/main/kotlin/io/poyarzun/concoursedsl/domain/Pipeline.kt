@@ -1,12 +1,14 @@
 package io.poyarzun.concoursedsl.domain
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.PropertyNamingStrategy
+import com.fasterxml.jackson.databind.annotation.JsonNaming
+import io.poyarzun.concoursedsl.dsl.DslList
 
-data class Pipeline(
-    var jobs: MutableList<Job> = ArrayList(),
-    var groups: MutableList<Group> = ArrayList(),
-    var resources: MutableList<Resource<Any>> = ArrayList(),
-    @JsonProperty("resource_types")
-    var resourceTypes: MutableList<ResourceType> = ArrayList()
-)
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
+class Pipeline {
+    var jobs = DslList.empty<Job>()
+    var groups = DslList.empty<Group>()
+    var resources = DslList.empty<Resource<Any>>()
+    var resourceTypes = DslList.empty<ResourceType>()
+}
 

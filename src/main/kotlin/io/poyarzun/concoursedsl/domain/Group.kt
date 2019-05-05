@@ -1,7 +1,8 @@
 package io.poyarzun.concoursedsl.domain
 
-data class Group(
-    val name: String,
-    val jobs: MutableList<String> = ArrayList(),
-    val resources: MutableList<String> = ArrayList()
-)
+import io.poyarzun.concoursedsl.dsl.DslList
+
+data class Group(val name: String) {
+    val jobs = DslList.empty<String>()
+    val resources = DslList.empty<String>()
+}

@@ -11,15 +11,13 @@ class GitResourceTest {
             val myRepo = gitResource("my-git-resource", "git@github.com:org/repo.git") {
                 source {
                     branch = "cool-branch"
-                    gitConfig = mutableListOf(
-                            Git.Config("custom-git", "custom-git-value")
-                    )
-                    httpsTunnel = Git.HttpProxy(
-                            proxyHost = "proxy.org",
-                            proxyPort = "8080",
-                            proxyUser = "admin",
-                            proxyPassword = "password"
-                    )
+                    gitConfig {
+                        +Git.Config("custom-git", "custom-git-value")
+                    }
+                    httpsTunnel("proxy.org", "8080") {
+                        proxyUser = "admin"
+                        proxyPassword = "password"
+                    }
                 }
             }
 

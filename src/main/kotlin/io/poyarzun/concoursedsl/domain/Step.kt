@@ -3,8 +3,7 @@ package io.poyarzun.concoursedsl.domain
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import io.poyarzun.concoursedsl.dsl.DslList
-import io.poyarzun.concoursedsl.dsl.Tags
+import io.poyarzun.concoursedsl.dsl.*
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -13,51 +12,54 @@ sealed class Step : StepHookReceiver {
     var timeout: String? = null
     var attempts: Int? = null
 
+    // TODO: DslObject for hooks
     override var onSuccess: Step? = null
     override var onFailure: Step? = null
     override var onAbort: Step? = null
-
     override var ensure: Step? = null
 
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    data class GetStep<Params: Any>(
-        val get: String,
-        val params: Params,
-        var resource: String? = null,
-        var version: String? = null,
-        var passed: MutableList<String>? = null,
-        var trigger: Boolean? = null
-    ) : Step()
-
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    data class PutStep<GetParams: Any, PutParams: Any>(
-        val put: String,
-        val params: PutParams,
-        val getParams: GetParams,
+    data class GetStep<Params : Any>(
+            val get: String,
+            // TODO: DslObject for params
+            val params: Params) : Step() {
         var resource: String? = null
-    ) : Step()
+        var version: String? = null
+        var passed = DslList.empty<String>()
+        var trigger: Boolean? = null
+    }
 
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    data class TaskStep(
-        val task: String,
-        val inputMapping: MutableMap<String, String> = mutableMapOf(),
-        val outputMapping: MutableMap<String, String> = mutableMapOf(),
+    data class PutStep<GetParams : Any, PutParams : Any>(
+            val put: String,
+            // TODO: DslObject for PutParams
+            val params: PutParams,
+            // TODO: DslObject for GetParams
+            val getParams: GetParams) : Step() {
+        var resource: String? = null
+    }
+
+    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    data class TaskStep(val task: String) : Step() {
+        val inputMapping = DslMap.empty<String, String>()
+        val outputMapping = DslMap.empty<String, String>()
 
         // TODO: At most one of these is required
-        var config: Task? = null,
-        var file: String? = null,
+        var config = DslObject.from(::Task)
+        var file: String? = null
 
-        var privileged: Boolean? = null,
-        var params: Map<String, Any?>? = null,
+        var privileged: Boolean? = null
+        var params: Params = DslMap.empty()
         var image: String? = null
-    ) : Step()
+    }
 
-    data class AggregateStep(val aggregate: MutableList<Step> = ArrayList()) : Step()
+    data class AggregateStep(val aggregate: DslList<Step> = DslList.empty()) : Step()
 
-    data class DoStep(val `do`: MutableList<Step> = ArrayList()) : Step()
+    data class DoStep(val `do`: DslList<Step> = DslList.empty()) : Step()
 
+    // TODO: DslObject for Step
     data class TryStep(val `try`: Step) : Step()
 }

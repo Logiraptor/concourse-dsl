@@ -11,8 +11,8 @@ class YamlTest {
         val pipeline = pipeline {
             resourceType("rss", "docker-image") {
                 source {
-                    put("repository", "suhlig/concourse-rss-resource")
-                    put("tag", "latest")
+                    this["repository"] = "suhlig/concourse-rss-resource"
+                    this["tag"] = "latest"
                 }
                 checkEvery = "10m"
             }
@@ -27,9 +27,9 @@ class YamlTest {
 
             resource("results", "s3") {
                 source {
-                    put("bucket", "results-bucket")
-                    put("access_key", "((aws_access_key))")
-                    put("secret_key", "((aws_secret_key))")
+                    this["bucket"] = "results-bucket"
+                    this["access_key"] = "((aws_access_key))"
+                    this["secret_key"] = "((aws_secret_key))"
                 }
             }
 

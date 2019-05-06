@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import kotlin.reflect.*
 
+
 class TopLevel {
     var run = DslObject.from(::RunConfig)
     var run2 = DslObject.from(::RunConfig2)
@@ -38,18 +39,7 @@ class DslMap<Key, Value>(@JsonUnwrapped val map: MutableMap<Key, Value>) : Mutab
     operator fun invoke(config: ConfigBlock<DslMap<Key, Value>>) = config(this)
 }
 
-open class DslObject<T : Any>(value: T?) {
-
-    @JsonIgnore
-    var lastValue: T? = value
-
-    var value: T
-        @JsonUnwrapped
-        get() = lastValue as T
-        set(nextValue) {
-            lastValue = nextValue
-        }
-
+open class DslObject<T : Any>(@get:JsonUnwrapped var value: T?) {
     companion object {
         fun <T : Any> from(function: KFunction<T>) = DslObject0(function)
         fun <A, T : Any> from(function: KFunction1<A, T>) = DslObject1(function)

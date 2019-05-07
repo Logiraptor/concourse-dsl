@@ -1,6 +1,9 @@
 package io.poyarzun.concoursedsl.resources
-import io.poyarzun.concoursedsl.domain.Resource
-import io.poyarzun.concoursedsl.dsl.*
+
+import io.poyarzun.concoursedsl.dsl.generateYML
+import io.poyarzun.concoursedsl.dsl.job
+import io.poyarzun.concoursedsl.dsl.params
+import io.poyarzun.concoursedsl.dsl.pipeline
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -10,27 +13,24 @@ class CfResourceTest {
     fun completeYaml() {
 
         val actualYaml = generateYML(pipeline {
-            val resource: Resource<Cf.SourceParams> = cfResource(
-                    "resource-deploy-web-app",
-                    "https://api.run.pivotal.io",
-                    "ORG",
-                    "SPACE") {
-                source {
+            val resource = cfResource("resource-deploy-web-app") {
+                source("https://api.run.pivotal.io", "ORG", "SPACE") {
                     username = "EMAIL"
                     password = "PASSWORD"
                     skipCertCheck = false
                     clientId = "client-id"
                     clientSecret = "1Ur7Nyq4CtROxW9q4MUr"
                     verbose = true
-
                 }
             }
+
+            resources(resource)
 
             job("job-deploy-app") {
                 plan {
                     +put(resource, "build-output/manifest.yml") {
                         params {
-                            path="/build/lib/my-springboot-app.jar"
+                            path = "/build/lib/my-springboot-app.jar"
                             currentAppName = "turquoise-app"
                             vars = mapOf(
                                     "alpha" to "apple",
@@ -105,17 +105,15 @@ class CfResourceTest {
         // https://github.com/concourse/cf-resource
 
         val actualYaml = generateYML(pipeline {
-            val resource: Resource<Cf.SourceParams> = cfResource(
-                    "resource-deploy-web-app",
-                    "https://api.run.pivotal.io",
-                    "ORG",
-                    "SPACE") {
-                source {
+            val resource = cfResource("resource-deploy-web-app") {
+                source("https://api.run.pivotal.io", "ORG", "SPACE") {
                     username = "EMAIL"
                     password = "PASSWORD"
                     skipCertCheck = false
                 }
             }
+
+            resources(resource)
 
             job("job-deploy-app") {
                 plan {

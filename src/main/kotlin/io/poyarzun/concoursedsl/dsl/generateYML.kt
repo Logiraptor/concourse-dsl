@@ -26,6 +26,7 @@ object DslModule : SimpleModule() {
         }
     }
 
+    // This serializer customizes DslObject to be excluded from the yaml if the internal value is null
     class DslObjectSerializer(private val defaultSerializer: JsonSerializer<Any>) : JsonSerializer<DslObject<Any>>() {
 
         @Throws(IOException::class, JsonProcessingException::class)

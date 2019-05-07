@@ -17,19 +17,23 @@ class YamlTest {
                 checkEvery = "10m"
             }
 
-            val sourceCode = gitResource("concourse-dsl-source", "git@github.com:Logiraptor/concourse-dsl") {
-                source {
+            val sourceCode = gitResource("concourse-dsl-source") {
+                source("git@github.com:Logiraptor/concourse-dsl") {
                     privateKey = "((github-deploy-key))"
                 }
                 checkEvery = "20m"
                 webhookToken = "totally-a-secret"
             }
 
-            resource("results", "s3") {
-                source {
-                    this["bucket"] = "results-bucket"
-                    this["access_key"] = "((aws_access_key))"
-                    this["secret_key"] = "((aws_secret_key))"
+            resources {
+                +sourceCode
+
+                +resource("results", "s3") {
+                    source {
+                        this["bucket"] = "results-bucket"
+                        this["access_key"] = "((aws_access_key))"
+                        this["secret_key"] = "((aws_secret_key))"
+                    }
                 }
             }
 
@@ -128,13 +132,13 @@ class YamlTest {
                 get: "yet-another-resource"
             groups: []
             resources:
-            - name: "concourse-dsl-source"
+            - check_every: "20m"
+              webhook_token: "totally-a-secret"
+              name: "concourse-dsl-source"
               type: "git"
               source:
                 uri: "git@github.com:Logiraptor/concourse-dsl"
                 private_key: "((github-deploy-key))"
-              check_every: "20m"
-              webhook_token: "totally-a-secret"
             - name: "results"
               type: "s3"
               source:

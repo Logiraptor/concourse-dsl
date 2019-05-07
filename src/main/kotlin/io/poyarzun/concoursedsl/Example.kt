@@ -20,8 +20,8 @@ val customPipeline = pipeline {
         }
     }
 
-    gitResource("prod", "git@github.com:Logiraptor/concourse-dsl.git") {
-        source {
+    gitResource("prod") {
+        source("git@github.com:Logiraptor/concourse-dsl.git") {
             branch = "master"
         }
     }
@@ -39,7 +39,7 @@ val customPipeline = pipeline {
             jobs.add(job.name)
         }
 
-        this@pipeline.resources.forEach { resource: Resource<Any> ->
+        this@pipeline.resources.forEach { resource: Resource<*> ->
             resources.add(resource.name)
         }
     }
@@ -54,8 +54,8 @@ val customPipeline = pipeline {
 private fun Pipeline.sharedTemplate(name: String) {
     val sourceCodeResource = "$name-source-code"
 
-    gitResource(sourceCodeResource, "https://github.com/$name.git") {
-        source {
+    gitResource(sourceCodeResource) {
+        source("https://github.com/$name.git") {
             branch = "master"
         }
     }

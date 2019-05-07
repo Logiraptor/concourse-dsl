@@ -8,7 +8,7 @@ import io.poyarzun.concoursedsl.dsl.DslList
 class Pipeline {
     var jobs = DslList.empty<Job>()
     var groups = DslList.empty<Group>()
-    var resources = DslList.empty<Resource<Any>>()
+    var resources = DslList.empty<Resource<*>>()
     var resourceTypes = DslList.empty<ResourceType>()
 }
 

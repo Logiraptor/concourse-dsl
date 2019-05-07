@@ -62,13 +62,13 @@ private fun Pipeline.sharedTemplate(name: String) {
 
     job("${name.toUpperCase()} Test & Staging Deploy") {
         plan {
-            get(sourceCodeResource) {
+            +get(sourceCodeResource) {
                 trigger = true
             }
-            task("test") {
+            +task("test") {
                 file = "tasks/build.yml"
             }
-            put("non-prod") {
+            +put("non-prod") {
 
             }
         }
@@ -76,30 +76,28 @@ private fun Pipeline.sharedTemplate(name: String) {
 
     job("${name.toUpperCase()} Prod Deploy") {
         plan {
-            get(sourceCodeResource) {
+            +get(sourceCodeResource) {
                 trigger = false
                 passed {
                     add("${name.toUpperCase()} Test & Staging Deploy")
                 }
             }
-            task("build") {
+            +task("build") {
                 file = "tasks/build.yml"
             }
-            put("prod") {
+            +put("prod") {
 
             }
-            aggregate {
-                get(sourceCodeResource) {
+            +aggregate {
+                +get(sourceCodeResource) {
                     trigger = true
                 }
 
-                put("prod") {
+                +put("prod") {
 
                 }
 
-                `try` {
-
-                }
+                +`try`(get(sourceCodeResource) {})
             }
         }
     }

@@ -66,8 +66,8 @@ object Git {
 fun Pipeline.gitResource(name: String, uri: String, configBlock: ConfigBlock<Resource<Git.SourceParams>>) =
         this.baseResource(name, "git", Git.SourceParams(uri), configBlock)
 
-fun StepBuilder.get(repo: Resource<Git.SourceParams>, configBlock: ConfigBlock<Step.GetStep<Git.GetParams>>) =
-        this.baseGet(repo.name, Git.GetParams(), configBlock)
+fun get(repo: Resource<Git.SourceParams>, configBlock: ConfigBlock<Step.GetStep<Git.GetParams>>) =
+        baseGet(repo.name, Git.GetParams(), configBlock)
 
-fun StepBuilder.put(repo: Resource<Git.SourceParams>, repository: String, configBlock: ConfigBlock<Step.PutStep<Git.GetParams, Git.PutParams>>) =
-        this.basePut(repo.name, Git.PutParams(repository), Git.GetParams(), configBlock)
+fun put(repo: Resource<Git.SourceParams>, repository: String, configBlock: ConfigBlock<Step.PutStep<Git.GetParams, Git.PutParams>>) =
+        basePut(repo.name, Git.PutParams(repository), Git.GetParams(), configBlock)

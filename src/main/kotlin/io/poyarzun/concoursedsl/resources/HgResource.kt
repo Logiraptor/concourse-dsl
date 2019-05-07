@@ -6,7 +6,8 @@ import io.poyarzun.concoursedsl.domain.Pipeline
 import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.domain.Step
 import io.poyarzun.concoursedsl.dsl.ConfigBlock
-import io.poyarzun.concoursedsl.dsl.StepBuilder
+import io.poyarzun.concoursedsl.dsl.baseGet
+import io.poyarzun.concoursedsl.dsl.basePut
 import io.poyarzun.concoursedsl.dsl.baseResource
 
 object Hg {
@@ -36,8 +37,8 @@ object Hg {
 fun Pipeline.hgResource(name: String, uri: String, configBlock: ConfigBlock<Resource<Hg.SourceParams>>) =
         this.baseResource(name, "git", Hg.SourceParams(uri), configBlock)
 
-fun StepBuilder.get(resource: Resource<Hg.SourceParams>, configBlock: ConfigBlock<Step.GetStep<Hg.GetParams>>) =
+fun get(resource: Resource<Hg.SourceParams>, configBlock: ConfigBlock<Step.GetStep<Hg.GetParams>>) =
         baseGet(resource.name, Hg.GetParams(), configBlock)
 
-fun StepBuilder.put(resource: Resource<Hg.SourceParams>, repository: String, configBlock: ConfigBlock<Step.PutStep<Hg.GetParams, Hg.PutParams>>) =
+fun put(resource: Resource<Hg.SourceParams>, repository: String, configBlock: ConfigBlock<Step.PutStep<Hg.GetParams, Hg.PutParams>>) =
         basePut(resource.name, Hg.PutParams(repository), Hg.GetParams(), configBlock)

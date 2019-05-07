@@ -28,7 +28,7 @@ class CfResourceTest {
 
             job("job-deploy-app") {
                 plan {
-                    put(resource, "build-output/manifest.yml") {
+                    +put(resource, "build-output/manifest.yml") {
                         params {
                             path="/build/lib/my-springboot-app.jar"
                             currentAppName = "turquoise-app"
@@ -119,7 +119,7 @@ class CfResourceTest {
 
             job("job-deploy-app") {
                 plan {
-                    put(resource, "build-output/manifest.yml") {
+                    +put(resource, "build-output/manifest.yml") {
                         params {
                             environmentVariables =
                                     mapOf(

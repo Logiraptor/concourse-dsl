@@ -7,9 +7,8 @@ import io.poyarzun.concoursedsl.dsl.DslList
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-data class Job(val name: String) : StepHookReceiver {
-    // TODO: DslList for plan
-    val plan: MutableList<Step> = ArrayList()
+data class Job(val name: String) {
+    val plan = DslList.empty<Step>()
     var serial: Boolean? = null
     var buildLogsToRetain: Int? = null
     val serialGroups = DslList.empty<String>()
@@ -18,9 +17,8 @@ data class Job(val name: String) : StepHookReceiver {
     var disableManualTrigger: Boolean? = null
     var interruptible: Boolean? = null
 
-    // TODO: DslObject for hooks
-    override var onSuccess: Step? = null
-    override var onFailure: Step? = null
-    override var onAbort: Step? = null
-    override var ensure: Step? = null
+    var onSuccess: Step? = null
+    var onFailure: Step? = null
+    var onAbort: Step? = null
+    var ensure: Step? = null
 }

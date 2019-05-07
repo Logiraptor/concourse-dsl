@@ -1,13 +1,8 @@
 package io.poyarzun.concoursedsl.dsl
 
-import io.poyarzun.concoursedsl.domain.Job
 import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.domain.Step
 import io.poyarzun.concoursedsl.domain.Task
-
-fun Job.plan(configBlock: ConfigBlock<StepBuilder>) {
-    StepBuilder(this.plan::add).apply(configBlock)
-}
 
 fun <SourceProps : Any> Resource<SourceProps>.source(configBlock: ConfigBlock<SourceProps>) {
     this.source.apply(configBlock)

@@ -37,8 +37,6 @@ class PipelineDslTest {
         pipeline.resourceTypes[0].apply {
             assertEquals("email", name)
             assertEquals("docker-image", type)
-            val source = source
-            assertTrue(source != null)
             assertEquals("somebody/email", source["image"])
         }
     }
@@ -65,7 +63,7 @@ class PipelineDslTest {
         pipeline.apply {
             job("Job 1") {
                 plan {
-                    task("My Task") {
+                    +task("My Task") {
                         file = "source-code/unit.yml"
                     }
                 }

@@ -35,10 +35,10 @@ class YamlTest {
 
             job("Test") {
                 plan {
-                    get(sourceCode) {
+                    +get(sourceCode) {
                         trigger = true
                     }
-                    task("run-tests") {
+                    +task("run-tests") {
                         inputMapping {
                             put("source-code", "concourse-dsl-source")
                         }
@@ -64,7 +64,7 @@ class YamlTest {
                             }
                         }
                     }
-                    put("results") {
+                    +put("results") {
                         getParams {
                             put("skip_download", "true")
                         }
@@ -77,15 +77,9 @@ class YamlTest {
 
                 disableManualTrigger = false
 
-                onSuccess {
-                    get("some-resource") {}
-                }
-                onFailure {
-                    get("some-other-resource") {}
-                }
-                onAbort {
-                    get("yet-another-resource") {}
-                }
+                onSuccess = get("some-resource") {}
+                onFailure = get("some-other-resource") {}
+                onAbort = get("yet-another-resource") {}
             }
         }
 

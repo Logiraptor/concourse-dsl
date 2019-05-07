@@ -7,23 +7,19 @@ import io.poyarzun.concoursedsl.dsl.*
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-sealed class Step : StepHookReceiver {
+sealed class Step {
     val tags: Tags = DslList.empty()
     var timeout: String? = null
     var attempts: Int? = null
 
-    // TODO: DslObject for hooks
-    override var onSuccess: Step? = null
-    override var onFailure: Step? = null
-    override var onAbort: Step? = null
-    override var ensure: Step? = null
+    var onSuccess: Step? = null
+    var onFailure: Step? = null
+    var onAbort: Step? = null
+    var ensure: Step? = null
 
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    data class GetStep<Params : Any>(
-            val get: String,
-            // TODO: DslObject for params
-            val params: Params) : Step() {
+    data class GetStep<Params : Any>(val get: String, val params: Params) : Step() {
         var resource: String? = null
         var version: String? = null
         var passed = DslList.empty<String>()
@@ -32,12 +28,7 @@ sealed class Step : StepHookReceiver {
 
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    data class PutStep<GetParams : Any, PutParams : Any>(
-            val put: String,
-            // TODO: DslObject for PutParams
-            val params: PutParams,
-            // TODO: DslObject for GetParams
-            val getParams: GetParams) : Step() {
+    data class PutStep<GetParams : Any, PutParams : Any>(val put: String, val params: PutParams, val getParams: GetParams) : Step() {
         var resource: String? = null
     }
 
@@ -60,6 +51,5 @@ sealed class Step : StepHookReceiver {
 
     data class DoStep(val `do`: DslList<Step> = DslList.empty()) : Step()
 
-    // TODO: DslObject for Step
     data class TryStep(val `try`: Step) : Step()
 }

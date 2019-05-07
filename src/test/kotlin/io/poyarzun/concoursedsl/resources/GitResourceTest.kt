@@ -23,14 +23,14 @@ class GitResourceTest {
 
             job("get-put-repo") {
                 plan {
-                    get(myRepo) {
+                    +get(myRepo) {
                         params {
                             submodules = "all"
                             depth = 10
                         }
                     }
 
-                    put(myRepo, "./output") {
+                    +put(myRepo, "./output") {
                         params {
                             rebase = true
                         }

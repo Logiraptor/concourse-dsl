@@ -6,7 +6,8 @@ import io.poyarzun.concoursedsl.domain.Pipeline
 import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.domain.Step
 import io.poyarzun.concoursedsl.dsl.ConfigBlock
-import io.poyarzun.concoursedsl.dsl.StepBuilder
+import io.poyarzun.concoursedsl.dsl.baseGet
+import io.poyarzun.concoursedsl.dsl.basePut
 import io.poyarzun.concoursedsl.dsl.baseResource
 
 // https://github.com/concourse/cf-resource
@@ -49,8 +50,8 @@ fun Pipeline.cfResource(name: String,
                         configBlock: ConfigBlock<Resource<Cf.SourceParams>>) =
         this.baseResource(name, "cf", Cf.SourceParams(api, organization, space), configBlock)
 
-fun StepBuilder.get(resource: Resource<Cf.SourceParams>, configBlock: ConfigBlock<Step.GetStep<Cf.GetParams>>) =
-        this.baseGet(resource.name, Cf.GetParams(), configBlock)
+fun get(resource: Resource<Cf.SourceParams>, configBlock: ConfigBlock<Step.GetStep<Cf.GetParams>>) =
+        baseGet(resource.name, Cf.GetParams(), configBlock)
 
-fun StepBuilder.put(resource: Resource<Cf.SourceParams>, manifest: String, configBlock: ConfigBlock<Step.PutStep<Cf.GetParams, Cf.PutParams>>) =
-        this.basePut(resource.name, Cf.PutParams(manifest), Cf.GetParams(), configBlock)
+fun put(resource: Resource<Cf.SourceParams>, manifest: String, configBlock: ConfigBlock<Step.PutStep<Cf.GetParams, Cf.PutParams>>) =
+        basePut(resource.name, Cf.PutParams(manifest), Cf.GetParams(), configBlock)

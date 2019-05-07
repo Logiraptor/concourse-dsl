@@ -43,8 +43,8 @@ class PipelineDslTest {
 
     @Test
     fun `dsl configures basic resource properties`() {
-        pipeline.apply {
-            resource("source-code", "git") {
+        pipeline.resources {
+            +resource("source-code", "git") {
                 source {
                     put("uri", "ssh://git@github.com/team/project.git")
                     put("key", "((private_key))")

@@ -10,12 +10,11 @@ import io.poyarzun.concoursedsl.dsl.Version
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-data class Resource<Source : Any>(
-        val name: String,
-        val type: String,
-        val source: Source,
-        val tags: Tags = DslList.empty(),
-        val version: Version = DslMap.empty(),
-        var checkEvery: String = "",
-        var webhookToken: String = ""
-)
+abstract class Resource<Source : Any>(val name: String, val type: String) {
+    abstract val source: Source
+
+    val tags: Tags = DslList.empty()
+    val version: Version = DslMap.empty()
+    var checkEvery: String = ""
+    var webhookToken: String = ""
+}

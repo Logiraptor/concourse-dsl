@@ -29,16 +29,8 @@ fun Pipeline.group(name: String, configBlock: ConfigBlock<Group>) =
  *
  * @see Resource
  */
-fun Pipeline.resource(name: String, type: String, configBlock: ConfigBlock<Resource<Source>>) =
-        baseResource(name, type, DslMap.empty(), configBlock)
-
-/**
- * Declare a resource named [name] of type [type] in the pipeline and configurePlainObject it with [configBlock]
- *
- * @see Resource
- */
-fun <SourceProps: Any> Pipeline.baseResource(name: String, type: String, sourceProps: SourceProps, configBlock: ConfigBlock<Resource<SourceProps>>) =
-        (Resource(name, type, sourceProps).apply(configBlock)).also { resources.add(it as Resource<Any>) }
+fun resource(name: String, type: String, configBlock: ConfigBlock<Resource<Source>>) =
+        GenericResource(name, type).apply(configBlock)
 
 /**
  * Declare a resource type named [name] of type [type] in the pipeline and configurePlainObject it with [configBlock]

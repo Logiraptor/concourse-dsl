@@ -3,7 +3,6 @@ package io.poyarzun.concoursedsl.resources
 import io.poyarzun.concoursedsl.dsl.generateYML
 import io.poyarzun.concoursedsl.dsl.job
 import io.poyarzun.concoursedsl.dsl.pipeline
-import io.poyarzun.concoursedsl.dsl.source
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -16,6 +15,8 @@ class TimeResourceTest {
                     interval = "10m"
                 }
             }
+
+            resources(myTime)
 
             job("get-put") {
                 plan {

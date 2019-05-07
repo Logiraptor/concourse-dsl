@@ -1,6 +1,9 @@
 package io.poyarzun.concoursedsl.resources
 
-import io.poyarzun.concoursedsl.dsl.*
+import io.poyarzun.concoursedsl.dsl.generateYML
+import io.poyarzun.concoursedsl.dsl.job
+import io.poyarzun.concoursedsl.dsl.params
+import io.poyarzun.concoursedsl.dsl.pipeline
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -8,12 +11,14 @@ class HgResourceTest {
     @Test
     fun testYaml() {
         val actualYaml = generateYML(pipeline {
-            val myRepo = hgResource("my-git-resource", "git@github.com:org/repo.git") {
-                source {
+            val myRepo = hgResource("my-hg-resource") {
+                source("git@github.com:org/repo.git") {
                     branch = "cool-branch"
                     tagFilter = "deploy\\-.*"
                 }
             }
+
+            resources(myRepo)
 
             job("get-put") {
                 plan {
@@ -33,17 +38,17 @@ class HgResourceTest {
             jobs:
             - name: "get-put"
               plan:
-              - get: "my-git-resource"
+              - get: "my-hg-resource"
                 params: {}
-              - put: "my-git-resource"
+              - put: "my-hg-resource"
                 params:
                   repository: "repo-path"
                   rebase: true
                 get_params: {}
             groups: []
             resources:
-            - name: "my-git-resource"
-              type: "git"
+            - name: "my-hg-resource"
+              type: "hg"
               source:
                 uri: "git@github.com:org/repo.git"
                 branch: "cool-branch"

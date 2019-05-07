@@ -8,11 +8,11 @@ class GitResourceTest {
     @Test
     fun testYaml() {
         val actualYaml = generateYML(pipeline {
-            val myRepo = gitResource("my-git-resource", "git@github.com:org/repo.git") {
-                source {
+            val myRepo = gitResource("my-git-resource") {
+                source("git@github.com:org/repo.git") {
                     branch = "cool-branch"
                     gitConfig {
-                        +Git.Config("custom-git", "custom-git-value")
+                        +GitResource.Config("custom-git", "custom-git-value")
                     }
                     httpsTunnel("proxy.org", "8080") {
                         proxyUser = "admin"
@@ -20,6 +20,8 @@ class GitResourceTest {
                     }
                 }
             }
+
+            resources(myRepo)
 
             job("get-put-repo") {
                 plan {

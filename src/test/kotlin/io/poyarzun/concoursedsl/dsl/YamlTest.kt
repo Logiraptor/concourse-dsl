@@ -1,5 +1,7 @@
 package io.poyarzun.concoursedsl.dsl
 
+import io.poyarzun.concoursedsl.domain.get
+import io.poyarzun.concoursedsl.domain.put
 import io.poyarzun.concoursedsl.resources.get
 import io.poyarzun.concoursedsl.resources.gitResource
 import org.junit.Test
@@ -94,9 +96,8 @@ class YamlTest {
             jobs:
             - name: "Test"
               plan:
-              - get: "concourse-dsl-source"
-                params: {}
-                trigger: true
+              - trigger: true
+                get: "concourse-dsl-source"
               - task: "run-tests"
                 input_mapping:
                   source-code: "concourse-dsl-source"

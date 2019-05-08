@@ -6,8 +6,6 @@ import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.domain.Step
 import io.poyarzun.concoursedsl.dsl.ConfigBlock
 import io.poyarzun.concoursedsl.dsl.DslObject
-import io.poyarzun.concoursedsl.dsl.baseGet
-import io.poyarzun.concoursedsl.dsl.basePut
 
 // https://github.com/concourse/cf-resource
 class CfResource(name: String) : Resource<DslObject<CfResource.SourceParams>>(name, "cf") {
@@ -37,13 +35,22 @@ class CfResource(name: String) : Resource<DslObject<CfResource.SourceParams>>(na
         var showAppLog: Boolean? = null
         var noStart: Boolean? = null
     }
+
+    class GetStep(name: String) : Step.GetStep<DslObject<GetParams>>(name) {
+        override val params = DslObject.from(::GetParams)
+    }
+
+    class PutStep(name: String) : Step.PutStep<DslObject<GetParams>, DslObject<PutParams>>(name) {
+        override val params = DslObject.from(::PutParams)
+        override val getParams = DslObject.from(::GetParams)
+    }
 }
 
 fun cfResource(name: String, configBlock: ConfigBlock<CfResource>) =
         CfResource(name).apply(configBlock)
 
-fun get(resource: CfResource, configBlock: ConfigBlock<Step.GetStep<CfResource.GetParams>>) =
-        baseGet(resource.name, CfResource.GetParams(), configBlock)
+fun get(resource: CfResource, configBlock: ConfigBlock<CfResource.GetStep>) =
+        CfResource.GetStep(resource.name).apply(configBlock)
 
-fun put(resource: CfResource, manifest: String, configBlock: ConfigBlock<Step.PutStep<CfResource.GetParams, CfResource.PutParams>>) =
-        basePut(resource.name, CfResource.PutParams(manifest), CfResource.GetParams(), configBlock)
+fun put(resource: CfResource, configBlock: ConfigBlock<CfResource.PutStep>) =
+        CfResource.PutStep(resource.name).apply(configBlock)

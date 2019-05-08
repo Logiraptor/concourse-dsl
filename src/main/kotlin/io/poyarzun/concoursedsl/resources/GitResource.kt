@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.domain.Step
-import io.poyarzun.concoursedsl.dsl.*
+import io.poyarzun.concoursedsl.dsl.ConfigBlock
+import io.poyarzun.concoursedsl.dsl.DslList
+import io.poyarzun.concoursedsl.dsl.DslObject
 
 class GitResource(name: String) : Resource<DslObject<GitResource.SourceParams>>(name, "git") {
     override val source = DslObject.from(::SourceParams)
@@ -62,13 +64,22 @@ class GitResource(name: String) : Resource<DslObject<GitResource.SourceParams>>(
         var annotate: String? = null
         var notes: String? = null
     }
+
+    class GetStep(name: String) : Step.GetStep<DslObject<GetParams>>(name) {
+        override val params = DslObject.from(::GetParams)
+    }
+
+    class PutStep(name: String) : Step.PutStep<DslObject<GetParams>, DslObject<PutParams>>(name) {
+        override val params = DslObject.from(::PutParams)
+        override val getParams = DslObject.from(::GetParams)
+    }
 }
 
 fun gitResource(name: String, configBlock: ConfigBlock<GitResource>) =
         GitResource(name).apply(configBlock)
 
-fun get(repo: GitResource, configBlock: ConfigBlock<Step.GetStep<GitResource.GetParams>>) =
-        baseGet(repo.name, GitResource.GetParams(), configBlock)
+fun get(repo: GitResource, configBlock: ConfigBlock<GitResource.GetStep>) =
+        GitResource.GetStep(repo.name).apply(configBlock)
 
-fun put(repo: GitResource, repository: String, configBlock: ConfigBlock<Step.PutStep<GitResource.GetParams, GitResource.PutParams>>) =
-        basePut(repo.name, GitResource.PutParams(repository), GitResource.GetParams(), configBlock)
+fun put(repo: GitResource, configBlock: ConfigBlock<GitResource.PutStep>) =
+        GitResource.PutStep(repo.name).apply(configBlock)

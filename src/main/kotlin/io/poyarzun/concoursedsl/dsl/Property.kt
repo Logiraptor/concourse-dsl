@@ -1,33 +1,8 @@
 package io.poyarzun.concoursedsl.dsl
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import kotlin.reflect.*
-
-
-class TopLevel {
-    var run = DslObject.from(::RunConfig)
-    var run2 = DslObject.from(::RunConfig2)
-}
-
-class RunConfig {
-    var path: String? = null
-    val args: DslList<String> = DslList.empty()
-    var dir: String? = null
-    var user: String? = null
-
-    val params: DslMap<String, String> = DslMap.empty()
-}
-
-class RunConfig2(val path: String) {
-    val args: DslList<String> = DslList.empty()
-    var dir: String? = null
-    var user: String? = null
-}
 
 class DslMap<Key, Value>(@JsonUnwrapped val map: MutableMap<Key, Value>) : MutableMap<Key, Value> by map {
     companion object {
@@ -89,32 +64,4 @@ class DslList<T>(@JsonUnwrapped val list: MutableList<T>) : MutableList<T> by li
     operator fun invoke(vararg elements: T) = elements.forEach { +it }
 
     operator fun T.unaryPlus() = list.add(this)
-}
-
-fun main() {
-    val exp = TopLevel().apply {
-        run {
-            path = "foo"
-            args("Foo")
-
-            params {
-                this["repo"] = ""
-            }
-        }
-
-        run2("path") {
-            args {
-                +"ABC"
-            }
-
-            dir = "omg lol"
-        }
-    }
-
-    val mapper = ObjectMapper(YAMLFactory())
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-    mapper.registerModule(KotlinModule())
-    val output = mapper.writeValueAsString(exp)
-
-    println(output)
 }

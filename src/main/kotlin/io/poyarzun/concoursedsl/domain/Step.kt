@@ -19,7 +19,8 @@ sealed class Step {
 
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    data class GetStep<Params : Any>(val get: String, val params: Params) : Step() {
+    abstract class GetStep<Params : Any>(val get: String) : Step() {
+        abstract val params: Params
         var resource: String? = null
         var version: String? = null
         var passed = DslList.empty<String>()
@@ -28,7 +29,9 @@ sealed class Step {
 
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    data class PutStep<GetParams : Any, PutParams : Any>(val put: String, val params: PutParams, val getParams: GetParams) : Step() {
+    abstract class PutStep<GetParams : Any, PutParams : Any>(val put: String) : Step() {
+        abstract val params: PutParams
+        abstract val getParams: GetParams
         var resource: String? = null
     }
 

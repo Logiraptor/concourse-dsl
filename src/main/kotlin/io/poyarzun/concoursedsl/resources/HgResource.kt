@@ -6,8 +6,6 @@ import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.domain.Step
 import io.poyarzun.concoursedsl.dsl.ConfigBlock
 import io.poyarzun.concoursedsl.dsl.DslObject
-import io.poyarzun.concoursedsl.dsl.baseGet
-import io.poyarzun.concoursedsl.dsl.basePut
 
 class HgResource(name: String) : Resource<DslObject<HgResource.SourceParams>>(name, "hg") {
     override val source = DslObject.from(::SourceParams)
@@ -31,13 +29,22 @@ class HgResource(name: String) : Resource<DslObject<HgResource.SourceParams>>(na
         var tag: String? = null
         var tagPrefix: String? = null
     }
+
+    class GetStep(name: String) : Step.GetStep<DslObject<GetParams>>(name) {
+        override val params = DslObject.from(::GetParams)
+    }
+
+    class PutStep(name: String) : Step.PutStep<DslObject<GetParams>, DslObject<PutParams>>(name) {
+        override val params = DslObject.from(::PutParams)
+        override val getParams = DslObject.from(::GetParams)
+    }
 }
 
 fun hgResource(name: String, configBlock: ConfigBlock<HgResource>) =
         HgResource(name).apply(configBlock)
 
-fun get(resource: HgResource, configBlock: ConfigBlock<Step.GetStep<HgResource.GetParams>>) =
-        baseGet(resource.name, HgResource.GetParams(), configBlock)
+fun get(resource: HgResource, configBlock: ConfigBlock<HgResource.GetStep>) =
+        HgResource.GetStep(resource.name).apply(configBlock)
 
-fun put(resource: HgResource, repository: String, configBlock: ConfigBlock<Step.PutStep<HgResource.GetParams, HgResource.PutParams>>) =
-        basePut(resource.name, HgResource.PutParams(repository), HgResource.GetParams(), configBlock)
+fun put(repo: HgResource, configBlock: ConfigBlock<HgResource.PutStep>) =
+        HgResource.PutStep(repo.name).apply(configBlock)

@@ -1,6 +1,8 @@
 package io.poyarzun.concoursedsl.resources
 
-import io.poyarzun.concoursedsl.dsl.*
+import io.poyarzun.concoursedsl.dsl.generateYML
+import io.poyarzun.concoursedsl.dsl.job
+import io.poyarzun.concoursedsl.dsl.pipeline
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -32,8 +34,8 @@ class GitResourceTest {
                         }
                     }
 
-                    +put(myRepo, "./output") {
-                        params {
+                    +put(myRepo) {
+                        params("./output") {
                             rebase = true
                         }
 

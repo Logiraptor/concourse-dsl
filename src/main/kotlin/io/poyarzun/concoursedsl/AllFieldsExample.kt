@@ -1,6 +1,8 @@
 package io.poyarzun.concoursedsl
 
 import io.poyarzun.concoursedsl.domain.Step
+import io.poyarzun.concoursedsl.domain.get
+import io.poyarzun.concoursedsl.domain.put
 import io.poyarzun.concoursedsl.dsl.*
 
 

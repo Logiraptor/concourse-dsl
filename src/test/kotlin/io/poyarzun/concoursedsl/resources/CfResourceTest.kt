@@ -2,7 +2,6 @@ package io.poyarzun.concoursedsl.resources
 
 import io.poyarzun.concoursedsl.dsl.generateYML
 import io.poyarzun.concoursedsl.dsl.job
-import io.poyarzun.concoursedsl.dsl.params
 import io.poyarzun.concoursedsl.dsl.pipeline
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -28,8 +27,8 @@ class CfResourceTest {
 
             job("job-deploy-app") {
                 plan {
-                    +put(resource, "build-output/manifest.yml") {
-                        params {
+                    +put(resource) {
+                        params("build-output/manifest.yml") {
                             path = "/build/lib/my-springboot-app.jar"
                             currentAppName = "turquoise-app"
                             vars = mapOf(
@@ -75,7 +74,6 @@ class CfResourceTest {
                   docker_password: "gibberish"
                   show_app_log: true
                   no_start: false
-                get_params: {}
             groups: []
             resources:
             - name: "resource-deploy-web-app"
@@ -117,8 +115,8 @@ class CfResourceTest {
 
             job("job-deploy-app") {
                 plan {
-                    +put(resource, "build-output/manifest.yml") {
-                        params {
+                    +put(resource) {
+                        params("build-output/manifest.yml") {
                             environmentVariables =
                                     mapOf(
                                             "key" to "value",
@@ -141,7 +139,6 @@ class CfResourceTest {
                   environment_variables:
                     key: "value"
                     key2: "value2"
-                get_params: {}
             groups: []
             resources:
             - name: "resource-deploy-web-app"

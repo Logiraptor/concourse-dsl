@@ -33,10 +33,7 @@ class TimeResourceTest {
             - name: "get-put"
               plan:
               - get: "every-10"
-                params: {}
               - put: "every-10"
-                params: {}
-                get_params: {}
             groups: []
             resources:
             - name: "every-10"

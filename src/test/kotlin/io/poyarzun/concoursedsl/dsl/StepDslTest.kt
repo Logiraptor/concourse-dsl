@@ -1,6 +1,8 @@
 package io.poyarzun.concoursedsl.dsl
 
 import io.poyarzun.concoursedsl.domain.Step
+import io.poyarzun.concoursedsl.domain.get
+import io.poyarzun.concoursedsl.domain.put
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

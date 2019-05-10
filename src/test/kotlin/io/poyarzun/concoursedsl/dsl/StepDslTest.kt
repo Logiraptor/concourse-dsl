@@ -1,8 +1,6 @@
 package io.poyarzun.concoursedsl.dsl
 
-import io.poyarzun.concoursedsl.domain.Step
-import io.poyarzun.concoursedsl.domain.get
-import io.poyarzun.concoursedsl.domain.put
+import io.poyarzun.concoursedsl.domain.*
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -17,13 +15,10 @@ class StepDslTest {
             }
         }
 
-        result.let { step ->
-            assertEquals("source-code", step.get)
-
-            step.passed.let {
-                assertEquals("Unit Tests", it[0])
-                assertEquals("QA Deployment", it[1])
-            }
+        assertEquals("source-code", result.get)
+        result.passed.let {
+            assertEquals("Unit Tests", it[0])
+            assertEquals("QA Deployment", it[1])
         }
     }
 
@@ -35,11 +30,8 @@ class StepDslTest {
             }
         }
 
-        result.let { step ->
-            assertEquals("cf", step.put)
-
-            assertEquals("source-code/manifest.yml", step.params["manifest"])
-        }
+        assertEquals("cf", result.put)
+        assertEquals("source-code/manifest.yml", result.params["manifest"])
     }
 
     @Test
@@ -48,11 +40,8 @@ class StepDslTest {
             file = "source-code/unit.yml"
         }
 
-        result.let { step ->
-            assertEquals("unit tests", step.task)
-
-            assertEquals("source-code/unit.yml", step.file)
-        }
+        assertEquals("unit tests", result.task)
+        assertEquals("source-code/unit.yml", result.file)
     }
 
     @Test
@@ -63,12 +52,10 @@ class StepDslTest {
             }
         }
 
-        result.let { step ->
-            step.aggregate[0].let { task ->
-                assertTrue(task is Step.TaskStep)
-                assertEquals("unit tests", task.task)
-                assertEquals("source-code/unit.yml", task.file)
-            }
+        result.aggregate[0].let { task ->
+            assertTrue(task is Step.TaskStep)
+            assertEquals("unit tests", task.task)
+            assertEquals("source-code/unit.yml", task.file)
         }
     }
 
@@ -80,12 +67,10 @@ class StepDslTest {
             }
         }
 
-        result.let { step ->
-            step.`do`[0].let { task ->
-                assertTrue(task is Step.TaskStep)
-                assertEquals("unit tests", task.task)
-                assertEquals("source-code/unit.yml", task.file)
-            }
+        result.`do`[0].let { task ->
+            assertTrue(task is Step.TaskStep)
+            assertEquals("unit tests", task.task)
+            assertEquals("source-code/unit.yml", task.file)
         }
     }
 
@@ -95,13 +80,10 @@ class StepDslTest {
             file = "source-code/unit.yml"
         })
 
-        result.let { step ->
-            step.`try`.let { task ->
-                assertTrue(task is Step.TaskStep)
-                assertEquals("unit tests", task.task)
-                assertEquals("source-code/unit.yml", task.file)
-            }
+        result.`try`.let { task ->
+            assertTrue(task is Step.TaskStep)
+            assertEquals("unit tests", task.task)
+            assertEquals("source-code/unit.yml", task.file)
         }
     }
 }
-

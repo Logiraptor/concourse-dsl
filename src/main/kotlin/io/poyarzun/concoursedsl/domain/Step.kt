@@ -3,7 +3,10 @@ package io.poyarzun.concoursedsl.domain
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import io.poyarzun.concoursedsl.dsl.*
+import io.poyarzun.concoursedsl.dsl.ConfigBlock
+import io.poyarzun.concoursedsl.dsl.DslList
+import io.poyarzun.concoursedsl.dsl.DslMap
+import io.poyarzun.concoursedsl.dsl.DslObject
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -56,3 +59,11 @@ sealed class Step {
 
     data class TryStep(val `try`: Step) : Step()
 }
+
+fun `try`(step: Step) = Step.TryStep(step)
+
+fun `do`(configBlock: ConfigBlock<DslList<Step>>) =
+        Step.DoStep(DslList.empty<Step>().apply(configBlock))
+
+fun aggregate(configBlock: ConfigBlock<DslList<Step>>) =
+        Step.AggregateStep(DslList.empty<Step>().apply(configBlock))

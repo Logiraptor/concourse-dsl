@@ -3,7 +3,10 @@ package io.poyarzun.concoursedsl.domain
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import io.poyarzun.concoursedsl.dsl.*
+import io.poyarzun.concoursedsl.dsl.ConfigBlock
+import io.poyarzun.concoursedsl.dsl.DslList
+import io.poyarzun.concoursedsl.dsl.DslMap
+import io.poyarzun.concoursedsl.dsl.DslObject
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -41,3 +44,15 @@ data class Task(val platform: String) {
 
     data class Cache(val path: String)
 }
+
+fun task(name: String, configBlock: ConfigBlock<Step.TaskStep>) =
+        Step.TaskStep(name).apply(configBlock)
+
+fun input(name: String, configBlock: ConfigBlock<Task.Input>) =
+        Task.Input(name).apply(configBlock)
+
+fun output(name: String, configBlock: ConfigBlock<Task.Output>) =
+        Task.Output(name).apply(configBlock)
+
+fun cache(name: String) =
+        Task.Cache(name)

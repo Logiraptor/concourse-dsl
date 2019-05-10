@@ -1,10 +1,7 @@
 package io.poyarzun.concoursedsl
 
 import io.poyarzun.concoursedsl.domain.*
-import io.poyarzun.concoursedsl.dsl.`try`
-import io.poyarzun.concoursedsl.dsl.aggregate
 import io.poyarzun.concoursedsl.dsl.generateYML
-import io.poyarzun.concoursedsl.dsl.task
 import io.poyarzun.concoursedsl.resources.gitResource
 
 val customPipeline = pipeline {
@@ -105,6 +102,6 @@ private fun Pipeline.sharedTemplate(name: String) {
     }
 }
 
-fun main(args: Array<String>) {
+fun main() {
     println(generateYML(customPipeline))
 }

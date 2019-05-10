@@ -76,7 +76,15 @@ class YamlTest {
                                         echo "OK" > result/result.out
                                     """.trimIndent()
                                     )
-                                    input("concourse-dsl-source") {}
+                                    inputs {
+                                        +input("concourse-dsl-source") {}
+                                    }
+                                    outputs {
+                                        +output("concourse-dsl-source") {}
+                                    }
+                                    caches {
+                                        +cache("concourse-dsl-source")
+                                    }
                                 }
                             }
                         }
@@ -128,6 +136,10 @@ class YamlTest {
                   rootfs_uri: "not-a-real-value"
                   inputs:
                   - name: "concourse-dsl-source"
+                  outputs:
+                  - name: "concourse-dsl-source"
+                  caches:
+                  - path: "concourse-dsl-source"
               - put: "results"
                 get_params:
                   skip_download: "true"

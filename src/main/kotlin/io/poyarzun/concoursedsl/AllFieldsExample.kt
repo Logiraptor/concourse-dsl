@@ -1,24 +1,26 @@
 package io.poyarzun.concoursedsl
 
 import io.poyarzun.concoursedsl.domain.*
-import io.poyarzun.concoursedsl.dsl.*
+import io.poyarzun.concoursedsl.dsl.generateYML
 
 
 val exhaustivePipeline = pipeline {
-    resourceType("resource-type-name", "resource-type-type") {
-        source {
-            put("source-key1", "source-value1")
-            put("source-key2", "source-value2")
-        }
-        privileged = true
-        params {
-            put("params-key1", "params-value1")
-            put("params-key2", "params-value2")
-        }
-        checkEvery = "check-every-value"
-        tags {
-            +"tag-name1"
-            +"tag-name2"
+    resourceTypes {
+        +resourceType("resource-type-name", "resource-type-type") {
+            source {
+                put("source-key1", "source-value1")
+                put("source-key2", "source-value2")
+            }
+            privileged = true
+            params {
+                put("params-key1", "params-value1")
+                put("params-key2", "params-value2")
+            }
+            checkEvery = "check-every-value"
+            tags {
+                +"tag-name1"
+                +"tag-name2"
+            }
         }
     }
 
@@ -41,11 +43,11 @@ val exhaustivePipeline = pipeline {
         }
     }
 
-    group("group-name") {
-        jobs.add("group-name-job-1")
-        jobs.add("group-name-job-2")
-        resources.add("group-name-resource-1")
-        resources.add("group-name-resource-2")
+    groups {
+        +group("group-name") {
+            jobs("group-name-job-1", "group-name-job-2")
+            resources("group-name-resource-1", "group-name-resource-2")
+        }
     }
 
     jobs {

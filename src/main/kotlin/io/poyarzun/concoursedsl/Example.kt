@@ -2,101 +2,115 @@ package io.poyarzun.concoursedsl
 
 import io.poyarzun.concoursedsl.domain.*
 import io.poyarzun.concoursedsl.dsl.generateYML
+import io.poyarzun.concoursedsl.resources.cfResource
+import io.poyarzun.concoursedsl.resources.get
 import io.poyarzun.concoursedsl.resources.gitResource
 
+val nonProdCF = cfResource("non-prod") {
+    source("https://api.sys.dev.cf.io", "dev", "dev") {
+    }
+}
+
+val prodCF = cfResource("prod") {
+    source("https://api.sys.prod.cf.io", "prod", "prod") {
+    }
+}
+
+val dslSourceCode = gitResource("concourse-dsl") {
+    source("git@github.com:Logiraptor/concourse-dsl.git") {
+        branch = "master"
+    }
+}
+
 val customPipeline = pipeline {
-    resource("non-prod", "cf") {
-        source {
-            put("api", "https://api.sys.dev.cf.io")
-            put("space", "dev")
-        }
+    resources {
+        +nonProdCF
+        +prodCF
+
+        +dslSourceCode
     }
 
-    resource("prod", "cf") {
-        source {
-            put("api", "https://api.sys.cf.io")
-            put("space", "dev")
+    resourceTypes {
+        +resourceType("email", "") {
+
         }
-    }
-
-    gitResource("prod") {
-        source("git@github.com:Logiraptor/concourse-dsl.git") {
-            branch = "master"
-        }
-    }
-
-    resourceType("email", "") {
-
     }
 
     sharedTemplate("mailer")
     sharedTemplate("mint")
     sharedTemplate("third")
 
-    group("All") {
-        this@pipeline.jobs.forEach { job ->
-            jobs.add(job.name)
-        }
+    groups {
+        +group("All") {
+            this@pipeline.jobs.forEach { job ->
+                jobs.add(job.name)
+            }
 
-        this@pipeline.resources.forEach { resource: Resource<*> ->
-            resources.add(resource.name)
+            this@pipeline.resources.forEach { resource: Resource<*> ->
+                resources.add(resource.name)
+            }
         }
     }
 
-    group("Mint") {
-        jobs.add("MINT Test & Staging Deploy")
-        jobs.add("MINT Prod Deploy")
+    groups {
+        +group("Mint") {
+            jobs.add("MINT Test & Staging Deploy")
+            jobs.add("MINT Prod Deploy")
+        }
     }
-
 }
 
 private fun Pipeline.sharedTemplate(name: String) {
-    val sourceCodeResource = "$name-source-code"
-
-    gitResource(sourceCodeResource) {
+    val sourceCodeResource = gitResource("$name-source-code") {
         source("https://github.com/$name.git") {
             branch = "master"
         }
     }
 
-    job("${name.toUpperCase()} Test & Staging Deploy") {
-        plan {
-            +get(sourceCodeResource) {
-                trigger = true
-            }
-            +task("test") {
-                file = "tasks/build.yml"
-            }
-            +put("non-prod") {
-
-            }
-        }
+    resources {
+        +sourceCodeResource
     }
 
-    job("${name.toUpperCase()} Prod Deploy") {
-        plan {
-            +get(sourceCodeResource) {
-                trigger = false
-                passed {
-                    add("${name.toUpperCase()} Test & Staging Deploy")
-                }
-            }
-            +task("build") {
-                file = "tasks/build.yml"
-            }
-            +put("prod") {
-
-            }
-            +aggregate {
+    jobs {
+        +job("${name.toUpperCase()} Test & Staging Deploy") {
+            plan {
                 +get(sourceCodeResource) {
                     trigger = true
                 }
+                +task("test") {
+                    file = "tasks/build.yml"
+                }
+                +put("non-prod") {
 
+                }
+            }
+        }
+
+        +job("${name.toUpperCase()} Prod Deploy") {
+            plan {
+                +get(sourceCodeResource) {
+                    trigger = false
+                    passed {
+                        +"${name.toUpperCase()} Test & Staging Deploy"
+                    }
+                }
+                +task("build") {
+                    file = "tasks/build.yml"
+                }
                 +put("prod") {
 
                 }
+                +aggregate {
+                    +get(sourceCodeResource) {
+                        trigger = true
+                    }
 
-                +`try`(get(sourceCodeResource) {})
+                    +put("prod") {
+
+                    }
+
+                    +`try`(get(sourceCodeResource) {})
+                }
             }
         }
     }

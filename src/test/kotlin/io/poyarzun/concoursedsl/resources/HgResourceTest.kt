@@ -1,8 +1,8 @@
 package io.poyarzun.concoursedsl.resources
 
+import io.poyarzun.concoursedsl.domain.job
+import io.poyarzun.concoursedsl.domain.pipeline
 import io.poyarzun.concoursedsl.dsl.generateYML
-import io.poyarzun.concoursedsl.dsl.job
-import io.poyarzun.concoursedsl.dsl.pipeline
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -19,13 +19,15 @@ class HgResourceTest {
 
             resources(myRepo)
 
-            job("get-put") {
-                plan {
-                    +get(myRepo) {}
+            jobs {
+                +job("get-put") {
+                    plan {
+                        +get(myRepo) {}
 
-                    +put(myRepo) {
-                        params("repo-path") {
-                            rebase = true
+                        +put(myRepo) {
+                            params("repo-path") {
+                                rebase = true
+                            }
                         }
                     }
                 }

@@ -14,3 +14,6 @@ data class ResourceType(val name: String, val type: String) {
     var privileged: Boolean? = null
     var checkEvery: String = ""
 }
+
+fun resourceType(name: String, type: String, configBlock: ConfigBlock<ResourceType>) =
+        ResourceType(name, type).apply(configBlock)

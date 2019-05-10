@@ -1,8 +1,6 @@
 package io.poyarzun.concoursedsl
 
-import io.poyarzun.concoursedsl.domain.Step
-import io.poyarzun.concoursedsl.domain.get
-import io.poyarzun.concoursedsl.domain.put
+import io.poyarzun.concoursedsl.domain.*
 import io.poyarzun.concoursedsl.dsl.*
 
 
@@ -24,21 +22,23 @@ val exhaustivePipeline = pipeline {
         }
     }
 
-    resource("resource-name", "resource-type") {
-        source {
-            put("source-key1", "source-value1")
-            put("source-key2", "source-value2")
+    resources {
+        +resource("resource-name", "resource-type") {
+            source {
+                put("source-key1", "source-value1")
+                put("source-key2", "source-value2")
+            }
+            version {
+                put("version-key1", "version-value1")
+                put("version-key2", "version-value2")
+            }
+            checkEvery = "check-every-value"
+            tags {
+                +"tag-name1"
+                +"tag-name2"
+            }
+            webhookToken = "webhook-token-value"
         }
-        version {
-            put("version-key1", "version-value1")
-            put("version-key2", "version-value2")
-        }
-        checkEvery = "check-every-value"
-        tags {
-            +"tag-name1"
-            +"tag-name2"
-        }
-        webhookToken = "webhook-token-value"
     }
 
     group("group-name") {
@@ -48,25 +48,27 @@ val exhaustivePipeline = pipeline {
         resources.add("group-name-resource-2")
     }
 
-    job("job-name") {
-        plan {
-            +exhaustiveSteps(true)
-        }
-        serial = true
-        buildLogsToRetain = 3
-        serialGroups {
-            add("serial-group-name1")
-            add("serial-group-name2")
-        }
-        maxInFlight = 7
-        public = false
-        disableManualTrigger = true
-        interruptible = false
+    jobs {
+        +job("job-name") {
+            plan {
+                +exhaustiveSteps(true)
+            }
+            serial = true
+            buildLogsToRetain = 3
+            serialGroups {
+                add("serial-group-name1")
+                add("serial-group-name2")
+            }
+            maxInFlight = 7
+            public = false
+            disableManualTrigger = true
+            interruptible = false
 
-        onSuccess = exhaustiveSteps()
-        onFailure = exhaustiveSteps()
-        onAbort = exhaustiveSteps()
-        ensure = exhaustiveSteps()
+            onSuccess = exhaustiveSteps()
+            onFailure = exhaustiveSteps()
+            onAbort = exhaustiveSteps()
+            ensure = exhaustiveSteps()
+        }
     }
 }
 

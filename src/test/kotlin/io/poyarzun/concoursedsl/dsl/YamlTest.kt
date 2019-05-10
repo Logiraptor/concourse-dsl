@@ -1,7 +1,6 @@
 package io.poyarzun.concoursedsl.dsl
 
-import io.poyarzun.concoursedsl.domain.get
-import io.poyarzun.concoursedsl.domain.put
+import io.poyarzun.concoursedsl.domain.*
 import io.poyarzun.concoursedsl.resources.get
 import io.poyarzun.concoursedsl.resources.gitResource
 import org.junit.Test
@@ -11,12 +10,14 @@ class YamlTest {
     @Test
     fun testBasicPipelineYamlUsesSnakeCase() {
         val pipeline = pipeline {
-            resourceType("rss", "docker-image") {
-                source {
-                    this["repository"] = "suhlig/concourse-rss-resource"
-                    this["tag"] = "latest"
+            resourceTypes {
+                +resourceType("rss", "docker-image") {
+                    source {
+                        this["repository"] = "suhlig/concourse-rss-resource"
+                        this["tag"] = "latest"
+                    }
+                    checkEvery = "10m"
                 }
-                checkEvery = "10m"
             }
 
             val sourceCode = gitResource("concourse-dsl-source") {
@@ -25,6 +26,14 @@ class YamlTest {
                 }
                 checkEvery = "20m"
                 webhookToken = "totally-a-secret"
+            }
+
+            groups {
+                +group("Source Code") {
+                    resources {
+                        +sourceCode.name
+                    }
+                }
             }
 
             resources {
@@ -39,53 +48,55 @@ class YamlTest {
                 }
             }
 
-            job("Test") {
-                plan {
-                    +get(sourceCode) {
-                        trigger = true
-                    }
-                    +task("run-tests") {
-                        inputMapping {
-                            put("source-code", "concourse-dsl-source")
+            jobs {
+                +job("Test") {
+                    plan {
+                        +get(sourceCode) {
+                            trigger = true
                         }
-                        outputMapping {
-                            put("result", "output")
-                        }
-                        config("linux") {
-                            rootfsUri = "not-a-real-value"
-                            imageResource("docker-image") {
-                                source {
-                                    put("resource", "maven")
-                                }
+                        +task("run-tests") {
+                            inputMapping {
+                                put("source-code", "concourse-dsl-source")
                             }
-                            run("/bin/sh") {
-                                args("-c", """
+                            outputMapping {
+                                put("result", "output")
+                            }
+                            config("linux") {
+                                rootfsUri = "not-a-real-value"
+                                imageResource("docker-image") {
+                                    source {
+                                        put("resource", "maven")
+                                    }
+                                }
+                                run("/bin/sh") {
+                                    args("-c", """
                                         cd source-code
                                         ./gradlew test
                                         mkdir result
                                         echo "OK" > result/result.out
                                     """.trimIndent()
-                                )
-                                input("concourse-dsl-source") {}
+                                    )
+                                    input("concourse-dsl-source") {}
+                                }
+                            }
+                        }
+                        +put("results") {
+                            getParams {
+                                put("skip_download", "true")
                             }
                         }
                     }
-                    +put("results") {
-                        getParams {
-                            put("skip_download", "true")
-                        }
-                    }
+
+                    buildLogsToRetain = 1
+                    serialGroups("unique-jobs")
+                    maxInFlight = 1
+
+                    disableManualTrigger = false
+
+                    onSuccess = get("some-resource") {}
+                    onFailure = get("some-other-resource") {}
+                    onAbort = get("yet-another-resource") {}
                 }
-
-                buildLogsToRetain = 1
-                serialGroups("unique-jobs")
-                maxInFlight = 1
-
-                disableManualTrigger = false
-
-                onSuccess = get("some-resource") {}
-                onFailure = get("some-other-resource") {}
-                onAbort = get("yet-another-resource") {}
             }
         }
 
@@ -131,7 +142,11 @@ class YamlTest {
                 get: "some-other-resource"
               on_abort:
                 get: "yet-another-resource"
-            groups: []
+            groups:
+            - name: "Source Code"
+              jobs: []
+              resources:
+              - "concourse-dsl-source"
             resources:
             - check_every: "20m"
               webhook_token: "totally-a-secret"

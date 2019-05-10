@@ -1,8 +1,8 @@
 package io.poyarzun.concoursedsl.resources
 
+import io.poyarzun.concoursedsl.domain.job
+import io.poyarzun.concoursedsl.domain.pipeline
 import io.poyarzun.concoursedsl.dsl.generateYML
-import io.poyarzun.concoursedsl.dsl.job
-import io.poyarzun.concoursedsl.dsl.pipeline
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -18,11 +18,13 @@ class TimeResourceTest {
 
             resources(myTime)
 
-            job("get-put") {
-                plan {
-                    +get(myTime)
+            jobs {
+                +job("get-put") {
+                    plan {
+                        +get(myTime)
 
-                    +put(myTime)
+                        +put(myTime)
+                    }
                 }
             }
         })

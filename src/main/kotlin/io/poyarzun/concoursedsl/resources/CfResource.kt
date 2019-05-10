@@ -1,10 +1,13 @@
 package io.poyarzun.concoursedsl.resources
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.domain.Step
 import io.poyarzun.concoursedsl.dsl.ConfigBlock
+import io.poyarzun.concoursedsl.dsl.DslList
+import io.poyarzun.concoursedsl.dsl.DslMap
 import io.poyarzun.concoursedsl.dsl.DslObject
 
 // https://github.com/concourse/cf-resource
@@ -24,12 +27,13 @@ class CfResource(name: String) : Resource<DslObject<CfResource.SourceParams>>(na
     class GetParams
 
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     data class PutParams(val manifest: String) {
         var path: String? = null
         var currentAppName: String? = null
-        var environmentVariables: Map<String, String>? = null
-        var vars: Map<String, String>? = null
-        var varsFiles: List<String>? = null
+        val environmentVariables = DslMap.empty<String, String>()
+        val vars = DslMap.empty<String, String>()
+        val varsFiles = DslList.empty<String>()
         var dockerUserName: String? = null
         var dockerPassword: String? = null
         var showAppLog: Boolean? = null

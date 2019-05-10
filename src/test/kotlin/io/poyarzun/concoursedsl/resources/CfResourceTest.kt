@@ -32,19 +32,19 @@ class CfResourceTest {
                             params("build-output/manifest.yml") {
                                 path = "/build/lib/my-springboot-app.jar"
                                 currentAppName = "turquoise-app"
-                                vars = mapOf(
-                                        "alpha" to "apple",
-                                        "beta" to "banana"
-                                )
-                                varsFiles = listOf("mu.properties", "nu.properties")
+                                vars {
+                                    this["alpha"] = "apple"
+                                    this["beta"] = "banana"
+                                }
+                                varsFiles("mu.properties", "nu.properties")
                                 dockerPassword = "gibberish"
                                 dockerUserName = "simon"
                                 showAppLog = true
                                 noStart = false
-                                environmentVariables =
-                                        mapOf(
-                                                "key" to "value",
-                                                "key2" to "value2")
+                                environmentVariables {
+                                    this["key"] = "value"
+                                    this["key2"] = "value2"
+                                }
                             }
                         }
                     }
@@ -120,10 +120,10 @@ class CfResourceTest {
                     plan {
                         +put(resource) {
                             params("build-output/manifest.yml") {
-                                environmentVariables =
-                                        mapOf(
-                                                "key" to "value",
-                                                "key2" to "value2")
+                                environmentVariables {
+                                    this["key"] = "value"
+                                    this["key2"] = "value2"
+                                }
                             }
                         }
                     }

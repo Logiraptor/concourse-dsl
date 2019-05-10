@@ -1,8 +1,8 @@
 package io.poyarzun.concoursedsl.resources
 
+import io.poyarzun.concoursedsl.domain.job
+import io.poyarzun.concoursedsl.domain.pipeline
 import io.poyarzun.concoursedsl.dsl.generateYML
-import io.poyarzun.concoursedsl.dsl.job
-import io.poyarzun.concoursedsl.dsl.pipeline
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -25,25 +25,27 @@ class CfResourceTest {
 
             resources(resource)
 
-            job("job-deploy-app") {
-                plan {
-                    +put(resource) {
-                        params("build-output/manifest.yml") {
-                            path = "/build/lib/my-springboot-app.jar"
-                            currentAppName = "turquoise-app"
-                            vars = mapOf(
-                                    "alpha" to "apple",
-                                    "beta" to "banana"
-                            )
-                            varsFiles = listOf("mu.properties", "nu.properties")
-                            dockerPassword = "gibberish"
-                            dockerUserName = "simon"
-                            showAppLog = true
-                            noStart = false
-                            environmentVariables =
-                                    mapOf(
-                                            "key" to "value",
-                                            "key2" to "value2")
+            jobs {
+                +job("job-deploy-app") {
+                    plan {
+                        +put(resource) {
+                            params("build-output/manifest.yml") {
+                                path = "/build/lib/my-springboot-app.jar"
+                                currentAppName = "turquoise-app"
+                                vars = mapOf(
+                                        "alpha" to "apple",
+                                        "beta" to "banana"
+                                )
+                                varsFiles = listOf("mu.properties", "nu.properties")
+                                dockerPassword = "gibberish"
+                                dockerUserName = "simon"
+                                showAppLog = true
+                                noStart = false
+                                environmentVariables =
+                                        mapOf(
+                                                "key" to "value",
+                                                "key2" to "value2")
+                            }
                         }
                     }
                 }
@@ -113,19 +115,20 @@ class CfResourceTest {
 
             resources(resource)
 
-            job("job-deploy-app") {
-                plan {
-                    +put(resource) {
-                        params("build-output/manifest.yml") {
-                            environmentVariables =
-                                    mapOf(
-                                            "key" to "value",
-                                            "key2" to "value2")
+            jobs {
+                +job("job-deploy-app") {
+                    plan {
+                        +put(resource) {
+                            params("build-output/manifest.yml") {
+                                environmentVariables =
+                                        mapOf(
+                                                "key" to "value",
+                                                "key2" to "value2")
+                            }
                         }
                     }
                 }
             }
-
         })
 
         val expectedYaml = """

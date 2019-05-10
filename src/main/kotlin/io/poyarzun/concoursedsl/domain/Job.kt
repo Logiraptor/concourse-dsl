@@ -3,6 +3,7 @@ package io.poyarzun.concoursedsl.domain
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
+import io.poyarzun.concoursedsl.dsl.ConfigBlock
 import io.poyarzun.concoursedsl.dsl.DslList
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
@@ -22,3 +23,6 @@ data class Job(val name: String) {
     var onAbort: Step? = null
     var ensure: Step? = null
 }
+
+fun job(name: String, configBlock: ConfigBlock<Job>) =
+        Job(name).apply(configBlock)

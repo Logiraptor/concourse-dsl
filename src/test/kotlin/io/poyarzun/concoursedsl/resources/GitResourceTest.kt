@@ -1,8 +1,8 @@
 package io.poyarzun.concoursedsl.resources
 
+import io.poyarzun.concoursedsl.domain.job
+import io.poyarzun.concoursedsl.domain.pipeline
 import io.poyarzun.concoursedsl.dsl.generateYML
-import io.poyarzun.concoursedsl.dsl.job
-import io.poyarzun.concoursedsl.dsl.pipeline
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -25,22 +25,24 @@ class GitResourceTest {
 
             resources(myRepo)
 
-            job("get-put-repo") {
-                plan {
-                    +get(myRepo) {
-                        params {
-                            submodules = "all"
-                            depth = 10
-                        }
-                    }
-
-                    +put(myRepo) {
-                        params("./output") {
-                            rebase = true
+            jobs {
+                +job("get-put-repo") {
+                    plan {
+                        +get(myRepo) {
+                            params {
+                                submodules = "all"
+                                depth = 10
+                            }
                         }
 
-                        getParams {
-                            depth = 1
+                        +put(myRepo) {
+                            params("./output") {
+                                rebase = true
+                            }
+
+                            getParams {
+                                depth = 1
+                            }
                         }
                     }
                 }

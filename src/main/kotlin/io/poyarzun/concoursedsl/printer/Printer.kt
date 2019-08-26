@@ -1,9 +1,6 @@
 package io.poyarzun.concoursedsl.printer
 
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.buildCodeBlock
+import com.squareup.kotlinpoet.*
 import io.poyarzun.concoursedsl.domain.*
 import io.poyarzun.concoursedsl.dsl.DslList
 import io.poyarzun.concoursedsl.dsl.DslMap
@@ -91,7 +88,7 @@ private fun <T : Any> CodeBlock.Builder.generatePropertyDsl(prefix: String, suff
             if (value.isEmpty()) return this
             beginControlFlow(name)
             value.forEach {
-                addStatement("put(%S, %S)", it.key, it.value)
+                addStatement("put(%S, %L)", it.key, generateLiteral(it.value))
             }
             endControlFlow()
         }
@@ -112,6 +109,23 @@ private fun <T : Any> CodeBlock.Builder.generatePropertyDsl(prefix: String, suff
         }
         else -> {
             generateConstructorDsl("$name = ", "", typeToName(value.javaClass.kotlin), value)
+        }
+    }
+}
+
+fun generateLiteral(value: Any?): CodeBlock {
+    return buildCodeBlock {
+        when (value) {
+            is String -> add("%S", value)
+            is List<*> -> add(value.map(::generateLiteral).joinToCode(prefix = "listOf(", suffix = ")"))
+            is Int -> add("%L", value)
+            is Boolean -> add("%L", value)
+            is Map<*, *> -> add(value.map {
+                buildCodeBlock {
+                    add("%S to %L", it.key, generateLiteral(it.value))
+                }
+            }.joinToCode(prefix = "mapOf(", suffix = ")"))
+            else -> add("TODO(%S)", "Cannot generate dsl for literal: $value")
         }
     }
 }
@@ -162,6 +176,9 @@ private fun <T : Any> typeToName(type: KClass<T>): String {
         type.isSubclassOf(Step.TryStep::class) -> "`try`"
         type.isSubclassOf(ResourceType::class) -> "resourceType"
         type.isSubclassOf(GenericResource::class) -> "resource"
+        type.isSubclassOf(Task.Cache::class) -> "cache"
+        type.isSubclassOf(Task.Input::class) -> "input"
+        type.isSubclassOf(Task.Output::class) -> "output"
         else -> TODO("typeToName($type)")
     }
 }

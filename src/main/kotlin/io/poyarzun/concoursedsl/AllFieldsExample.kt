@@ -160,22 +160,28 @@ private fun exhaustiveSteps(recurse: Boolean = false): Step {
                     }
                 }
                 rootfsUri = "rootfs-uri-value"
-                input("input-name1") {
-                    path = "path-value"
-                    optional = false
+                inputs {
+                    +input("input-name1") {
+                        path = "path-value"
+                        optional = false
+                    }
+                    +input("input-name2") {
+                        path = "path-value"
+                        optional = false
+                    }
                 }
-                input("input-name2") {
-                    path = "path-value"
-                    optional = false
+                outputs {
+                    +output("output-name1") {
+                        path = "path-value"
+                    }
+                    +output("output-name2") {
+                        path = "path-value"
+                    }
                 }
-                output("output-name1") {
-                    path = "path-value"
+                caches {
+                    +cache("cache-path1")
+                    +cache("cache-path2")
                 }
-                output("output-name2") {
-                    path = "path-value"
-                }
-                cache("cache-path1")
-                cache("cache-path2")
 
                 params {
                     put("params-key1", "params-value1")

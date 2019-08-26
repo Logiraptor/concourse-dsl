@@ -71,6 +71,7 @@ class PrinterTest {
                 - "value2"
                 other_nested:
                   foo: "bar"
+                  null_value:
             - name: "results"
               type: "s3"
               source:
@@ -190,7 +191,7 @@ class PrinterTest {
                 resources {
                     +resource("concourse-dsl-source", "git") {
                         source {
-                            put("other_nested", mapOf("foo" to "bar"))
+                            put("other_nested", mapOf("foo" to "bar", "null_value" to null))
                             put("nested", listOf("value1", "value2"))
                             put("private_key", "((github-deploy-key))")
                             put("uri", "git@github.com:Logiraptor/concourse-dsl")

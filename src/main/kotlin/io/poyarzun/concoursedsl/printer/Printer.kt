@@ -125,7 +125,10 @@ fun generateLiteral(value: Any?): CodeBlock {
                     add("%S to %L", it.key, generateLiteral(it.value))
                 }
             }.joinToCode(prefix = "mapOf(", suffix = ")"))
-            else -> add("TODO(%S)", "Cannot generate dsl for literal: $value")
+            else -> when (value) {
+                null -> add("null")
+                else -> add("TODO(%S)", "Cannot generate dsl for literal: $value")
+            }
         }
     }
 }

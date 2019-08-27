@@ -1,0 +1,13 @@
+on: push
+name: Test
+jobs:
+  runUnitTests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Run Unit Tests
+      uses: docker://maven
+      with:
+        entrypoint: ./gradlew
+        args: test

@@ -1,4 +1,5 @@
 import java.net.URI
+import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.noarg.gradle.NoArgExtension
 import org.gradle.jvm.tasks.Jar
 
@@ -18,14 +19,20 @@ configure<NoArgExtension> {
 }
 
 group = "io.poyarzun"
-version = "0.3.2"
+version = "0.4.0"
 
 repositories {
     jcenter()
 }
 
+val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
+
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("script-runtime", kotlinVersion))
+    implementation(kotlin("compiler-embeddable", kotlinVersion))
+    implementation(kotlin("script-util", kotlinVersion))
+
     implementation("com.fasterxml.jackson.core:jackson-databind:2.9.5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.5")

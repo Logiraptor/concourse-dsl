@@ -19,7 +19,7 @@ configure<NoArgExtension> {
 }
 
 group = "io.poyarzun"
-version = "0.4.0"
+version = "0.4.1"
 
 repositories {
     jcenter()

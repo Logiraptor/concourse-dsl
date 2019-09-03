@@ -23,6 +23,10 @@ version = "0.4.0"
 
 repositories {
     jcenter()
+    maven {
+        url = URI.create("https://jitpack.io")
+    }
+
 }
 
 val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
@@ -38,6 +42,7 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.5")
     implementation("com.squareup:kotlinpoet:1.0.1")
 
+    testImplementation("com.github.xgouchet:Elmyr:0.11")
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))
 }

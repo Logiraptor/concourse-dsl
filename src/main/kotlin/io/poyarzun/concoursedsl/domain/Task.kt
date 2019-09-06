@@ -54,5 +54,5 @@ fun input(name: String, configBlock: ConfigBlock<Task.Input>) =
 fun output(name: String, configBlock: ConfigBlock<Task.Output>) =
         Task.Output(name).apply(configBlock)
 
-fun cache(name: String) =
+fun cache(name: String, configBlock: ConfigBlock<Task.Cache>) =
         Task.Cache(name)

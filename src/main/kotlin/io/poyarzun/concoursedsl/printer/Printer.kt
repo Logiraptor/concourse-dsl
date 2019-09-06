@@ -19,7 +19,7 @@ object Printer {
         val file = FileSpec.builder("pipeline", "Main")
                 .addImport("io.poyarzun.concoursedsl.domain",
                         "pipeline",
-                        "group", "aggregate",
+                        "group", "aggregate", "cache", "input", "output",
                         "task", "do", "resourceType", "try",
                         "job", "resource", "put", "get"
                 )

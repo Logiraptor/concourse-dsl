@@ -83,7 +83,7 @@ class YamlTest {
                                         +output("concourse-dsl-source") {}
                                     }
                                     caches {
-                                        +cache("concourse-dsl-source")
+                                        +cache("concourse-dsl-source") {}
                                     }
                                 }
                             }
@@ -170,8 +170,8 @@ class YamlTest {
             - name: "results"
               type: "s3"
               source:
-                bucket: "results-bucket"
                 access_key: "((aws_access_key))"
+                bucket: "results-bucket"
                 secret_key: "((aws_secret_key))"
             resource_types:
             - name: "rss"

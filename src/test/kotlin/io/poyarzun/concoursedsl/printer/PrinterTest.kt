@@ -94,10 +94,13 @@ class PrinterTest {
             package pipeline
 
             import io.poyarzun.concoursedsl.domain.aggregate
+            import io.poyarzun.concoursedsl.domain.cache
             import io.poyarzun.concoursedsl.domain.`do`
             import io.poyarzun.concoursedsl.domain.get
             import io.poyarzun.concoursedsl.domain.group
+            import io.poyarzun.concoursedsl.domain.input
             import io.poyarzun.concoursedsl.domain.job
+            import io.poyarzun.concoursedsl.domain.output
             import io.poyarzun.concoursedsl.domain.pipeline
             import io.poyarzun.concoursedsl.domain.put
             import io.poyarzun.concoursedsl.domain.resource

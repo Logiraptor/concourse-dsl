@@ -179,8 +179,8 @@ private fun exhaustiveSteps(recurse: Boolean = false): Step {
                     }
                 }
                 caches {
-                    +cache("cache-path1")
-                    +cache("cache-path2")
+                    +cache("cache-path1") {}
+                    +cache("cache-path2") {}
                 }
 
                 params {

@@ -2,6 +2,7 @@ import java.net.URI
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.noarg.gradle.NoArgExtension
 import org.gradle.jvm.tasks.Jar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.3.0"
@@ -14,12 +15,16 @@ plugins {
     id("org.jetbrains.kotlin.plugin.noarg") version "1.3.31"
 }
 
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
 configure<NoArgExtension> {
     annotation("io.poyarzun.concoursedsl.domain.NoArg")
 }
 
 group = "io.poyarzun"
-version = "0.4.1"
+version = "0.5.1"
 
 repositories {
     jcenter()
@@ -41,6 +46,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.5")
     implementation("com.squareup:kotlinpoet:1.0.1")
+    implementation("com.github.ajalt:clikt:2.1.0")
 
     testImplementation("com.github.xgouchet:Elmyr:0.11")
     testImplementation(kotlin("test"))
@@ -115,7 +121,7 @@ signing {
 }
 
 application {
-    mainClassName = "io.poyarzun.concoursedsl.printer.PrinterKt"
+    mainClassName = "io.poyarzun.concoursedsl.command.KflyCommandKt"
 }
 
 val fatJar = task("fatJar", type = Jar::class) {

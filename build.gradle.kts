@@ -45,7 +45,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.9.5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.5")
-    implementation("com.squareup:kotlinpoet:1.0.1")
+    implementation("com.squareup:kotlinpoet:1.3.0")
     implementation("com.github.ajalt:clikt:2.1.0")
 
     testImplementation("com.github.xgouchet:Elmyr:0.11")

@@ -10,6 +10,7 @@ import kotlin.test.assertEquals
 import fr.xgouchet.elmyr.junit.Repeater
 import io.poyarzun.concoursedsl.domain.Pipeline
 import io.poyarzun.concoursedsl.printer.Printer
+import org.junit.Before
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import javax.script.ScriptEngineManager

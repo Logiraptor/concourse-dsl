@@ -6,6 +6,7 @@ import io.poyarzun.concoursedsl.dsl.DslList
 import io.poyarzun.concoursedsl.dsl.DslMap
 import io.poyarzun.concoursedsl.dsl.DslObject
 import io.poyarzun.concoursedsl.dsl.readYML
+import io.poyarzun.concoursedsl.printer.Printer.generateJobsDsl
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.isSubclassOf
@@ -13,6 +14,8 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 
 object Printer {
+    val nameAllocator = NameAllocator()
+
     fun convertYamlToDsl(yaml: String): String {
         val pipeline = readYML(yaml)
 
@@ -24,7 +27,7 @@ object Printer {
                         "job", "resource", "put", "get"
                 )
                 .addImport("io.poyarzun.concoursedsl.dsl", "generateYML")
-                .addFunction(pipelineToSource(pipeline))
+                .pipelineToSource(pipeline)
                 .addFunction(FunSpec.builder("main")
                         .addStatement("println(generateYML(mainPipeline()))")
                         .build())
@@ -35,15 +38,78 @@ object Printer {
         }.toString()
     }
 
-    private fun pipelineToSource(pipeline: Pipeline): FunSpec {
-        return FunSpec.builder("mainPipeline")
-                .addStatement("return %L", generateDsl(pipeline, Pipeline::class))
-                .build()
+    private fun FileSpec.Builder.pipelineToSource(pipeline: Pipeline): FileSpec.Builder {
+        val jobNames = pipeline.jobs.map(::jobToFunctionName)
+        pipeline.jobs.forEachIndexed { i, it ->
+            addFunction(FunSpec.builder(jobNames[i]).addStatement("return %L", buildCodeBlock {
+                generateConstructorDsl("", "", typeToName(Job::class), it)
+            }).build())
+        }
+        val resourceNames = pipeline.resources.map { resourceToFunctionName(it as GenericResource) }
+        pipeline.resources.forEachIndexed { i, it ->
+            addFunction(FunSpec.builder(resourceNames[i]).addStatement("return %L", buildCodeBlock {
+                generateConstructorDsl("", "", typeToName(GenericResource::class), it)
+            }).build())
+        }
+        val resourceTypeNames = pipeline.resourceTypes.map(::resourceTypeToFunctionName)
+        pipeline.resourceTypes.forEachIndexed { i, it ->
+            addFunction(FunSpec.builder(resourceTypeNames[i]).addStatement("return %L", buildCodeBlock {
+                generateConstructorDsl("", "", typeToName(ResourceType::class), it)
+            }).build())
+        }
+
+        return addFunction(FunSpec.builder("mainPipeline")
+                .beginControlFlow("return pipeline")
+                .generateJobsDsl(jobNames, pipeline)
+                .generateResourcesDsl(resourceNames, pipeline)
+                .generateResourceTypesDsl(resourceTypeNames, pipeline)
+                .addCode(buildCodeBlock {
+                    generatePropertyDsl("", "", "groups", pipeline.groups)
+                })
+                .endControlFlow()
+                .build())
+    }
+
+    private fun FunSpec.Builder.generateJobsDsl(names: List<String>, pipeline: Pipeline): FunSpec.Builder {
+        beginControlFlow("jobs")
+        pipeline.jobs.forEachIndexed { i, _ ->
+            addStatement("+%N()", names[i])
+        }
+        return endControlFlow()
+    }
+
+    private fun FunSpec.Builder.generateResourcesDsl(names: List<String>, pipeline: Pipeline): FunSpec.Builder {
+        beginControlFlow("resources")
+        pipeline.resources.forEachIndexed { i, it ->
+            addStatement("+%N()", names[i])
+        }
+        return endControlFlow()
+    }
+
+    private fun FunSpec.Builder.generateResourceTypesDsl(names: List<String>, pipeline: Pipeline): FunSpec.Builder {
+        beginControlFlow("resourceTypes")
+        pipeline.resourceTypes.forEachIndexed { i, it ->
+            addStatement("+%N()", names[i])
+        }
+        return endControlFlow()
+    }
+
+    private fun jobToFunctionName(job: Job): String {
+        return nameAllocator.newName(job.name)
+    }
+
+    private fun resourceToFunctionName(resource: GenericResource): String {
+        return nameAllocator.newName(resource.name)
+    }
+
+    private fun resourceTypeToFunctionName(resourceType: ResourceType): String {
+        return nameAllocator.newName(resourceType.name)
     }
 
     private fun <T : Any> generateDsl(value: T, type: KClass<T>) = buildCodeBlock {
         generateConstructorDsl("", "", typeToName(type), value)
     }
+
     private fun <T : Any> CodeBlock.Builder.generateConstructorDsl(prefix: String, suffix: String, name: String, value: T): CodeBlock.Builder {
 
         when (value) {

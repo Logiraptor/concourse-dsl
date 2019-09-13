@@ -91,136 +91,147 @@ class PrinterTest {
         val dsl = Printer.convertYamlToDsl(testYaml)
 
         val expectedDsl = """
-            package pipeline
+                package pipeline
 
-            import io.poyarzun.concoursedsl.domain.aggregate
-            import io.poyarzun.concoursedsl.domain.cache
-            import io.poyarzun.concoursedsl.domain.`do`
-            import io.poyarzun.concoursedsl.domain.get
-            import io.poyarzun.concoursedsl.domain.group
-            import io.poyarzun.concoursedsl.domain.input
-            import io.poyarzun.concoursedsl.domain.job
-            import io.poyarzun.concoursedsl.domain.output
-            import io.poyarzun.concoursedsl.domain.pipeline
-            import io.poyarzun.concoursedsl.domain.put
-            import io.poyarzun.concoursedsl.domain.resource
-            import io.poyarzun.concoursedsl.domain.resourceType
-            import io.poyarzun.concoursedsl.domain.task
-            import io.poyarzun.concoursedsl.domain.`try`
-            import io.poyarzun.concoursedsl.dsl.generateYML
+                import io.poyarzun.concoursedsl.domain.`do`
+                import io.poyarzun.concoursedsl.domain.`try`
+                import io.poyarzun.concoursedsl.domain.aggregate
+                import io.poyarzun.concoursedsl.domain.cache
+                import io.poyarzun.concoursedsl.domain.get
+                import io.poyarzun.concoursedsl.domain.group
+                import io.poyarzun.concoursedsl.domain.input
+                import io.poyarzun.concoursedsl.domain.job
+                import io.poyarzun.concoursedsl.domain.output
+                import io.poyarzun.concoursedsl.domain.pipeline
+                import io.poyarzun.concoursedsl.domain.put
+                import io.poyarzun.concoursedsl.domain.resource
+                import io.poyarzun.concoursedsl.domain.resourceType
+                import io.poyarzun.concoursedsl.domain.task
+                import io.poyarzun.concoursedsl.dsl.generateYML
 
-            fun mainPipeline() = pipeline {
-                groups {
+                fun Test() = job("Test") {
+                  buildLogsToRetain = 1
+                  disableManualTrigger = false
+                  maxInFlight = 1
+                  onAbort = get("yet-another-resource") {
+                  }
+                  onFailure = get("some-other-resource") {
+                  }
+                  onSuccess = get("some-resource") {
+                  }
+                  plan {
+                    +get("concourse-dsl-source") {
+                      trigger = true
+                    }
+                    +task("run-tests") {
+                      config("linux") {
+                        caches {
+                          +cache("concourse-dsl-source") {
+                          }
+                        }
+                        imageResource("docker-image") {
+                          source {
+                            this["resource"] = "maven"
+                          }
+                        }
+                        inputs {
+                          +input("concourse-dsl-source") {
+                          }
+                        }
+                        outputs {
+                          +output("concourse-dsl-source") {
+                          }
+                        }
+                        rootfsUri = "not-a-real-value"
+                        run("/bin/sh") {
+                          args {
+                            +"-c"
+                            +""${'"'}
+                                |cd source-code
+                                |./gradlew test
+                                |mkdir result
+                                |echo "OK" > result/result.out
+                                ""${'"'}.trimMargin()
+                          }
+                        }
+                      }
+                      inputMapping {
+                        this["source-code"] = "concourse-dsl-source"
+                      }
+                      outputMapping {
+                        this["result"] = "output"
+                      }
+                    }
+                    +put("results") {
+                      getParams {
+                        this["skip_download"] = "true"
+                      }
+                    }
+                  }
+                  serialGroups {
+                    +"unique-jobs"
+                  }
+                }
+
+
+                fun concourse_dsl_source() = resource("concourse-dsl-source", "git") {
+                  source {
+                    this["other_nested"] = mapOf("foo" to "bar", "null_value" to null)
+                    this["nested"] = listOf("value1", "value2")
+                    this["private_key"] = "((github-deploy-key))"
+                    this["uri"] = "git@github.com:Logiraptor/concourse-dsl"
+                    this["non-bool"] = 4
+                    this["non-string"] = true
+                  }
+                  checkEvery = "20m"
+                  webhookToken = "totally-a-secret"
+                }
+
+
+                fun results() = resource("results", "s3") {
+                  source {
+                    this["secret_key"] = "((aws_secret_key))"
+                    this["access_key"] = "((aws_access_key))"
+                    this["bucket"] = "results-bucket"
+                  }
+                  checkEvery = ""
+                  webhookToken = ""
+                }
+
+
+                fun rss() = resourceType("rss", "docker-image") {
+                  checkEvery = "10m"
+                  source {
+                    this["tag"] = "latest"
+                    this["repository"] = "suhlig/concourse-rss-resource"
+                  }
+                }
+
+
+                fun mainPipeline() = pipeline {
+                  jobs {
+                    +Test()
+                  }
+                  resources {
+                    +concourse_dsl_source()
+                    +results()
+                  }
+                  resourceTypes {
+                    +rss()
+                  }
+                  groups {
                     +group("Source Code") {
-                        resources {
-                            +"concourse-dsl-source"
-                        }
+                      resources {
+                        +"concourse-dsl-source"
+                      }
                     }
+                  }
                 }
-                jobs {
-                    +job("Test") {
-                        buildLogsToRetain = 1
-                        disableManualTrigger = false
-                        maxInFlight = 1
-                        onAbort = get("yet-another-resource") {
-                        }
-                        onFailure = get("some-other-resource") {
-                        }
-                        onSuccess = get("some-resource") {
-                        }
-                        plan {
-                            +get("concourse-dsl-source") {
-                                trigger = true
-                            }
-                            +task("run-tests") {
-                                config("linux") {
-                                    caches {
-                                        +cache("concourse-dsl-source") {
-                                        }
-                                    }
-                                    imageResource("docker-image") {
-                                        source {
-                                            this["resource"] = "maven"
-                                        }
-                                    }
-                                    inputs {
-                                        +input("concourse-dsl-source") {
-                                        }
-                                    }
-                                    outputs {
-                                        +output("concourse-dsl-source") {
-                                        }
-                                    }
-                                    rootfsUri = "not-a-real-value"
-                                    run("/bin/sh") {
-                                        args {
-                                            +"-c"
-                                            +""${'"'}
-                                                    |cd source-code
-                                                    |./gradlew test
-                                                    |mkdir result
-                                                    |echo "OK" > result/result.out
-                                                    ""${'"'}.trimMargin()
-                                        }
-                                    }
-                                }
-                                inputMapping {
-                                    this["source-code"] = "concourse-dsl-source"
-                                }
-                                outputMapping {
-                                    this["result"] = "output"
-                                }
-                            }
-                            +put("results") {
-                                getParams {
-                                    this["skip_download"] = "true"
-                                }
-                            }
-                        }
-                        serialGroups {
-                            +"unique-jobs"
-                        }
-                    }
-                }
-                resourceTypes {
-                    +resourceType("rss", "docker-image") {
-                        checkEvery = "10m"
-                        source {
-                            this["tag"] = "latest"
-                            this["repository"] = "suhlig/concourse-rss-resource"
-                        }
-                    }
-                }
-                resources {
-                    +resource("concourse-dsl-source", "git") {
-                        source {
-                            this["other_nested"] = mapOf("foo" to "bar", "null_value" to null)
-                            this["nested"] = listOf("value1", "value2")
-                            this["private_key"] = "((github-deploy-key))"
-                            this["uri"] = "git@github.com:Logiraptor/concourse-dsl"
-                            this["non-bool"] = 4
-                            this["non-string"] = true
-                        }
-                        checkEvery = "20m"
-                        webhookToken = "totally-a-secret"
-                    }
-                    +resource("results", "s3") {
-                        source {
-                            this["secret_key"] = "((aws_secret_key))"
-                            this["access_key"] = "((aws_access_key))"
-                            this["bucket"] = "results-bucket"
-                        }
-                        checkEvery = ""
-                        webhookToken = ""
-                    }
-                }
-            }
 
-
-            fun main() {
-                println(generateYML(mainPipeline()))
-            }
-
+                fun main() {
+                  println(generateYML(mainPipeline()))
+                }
+                
         """.trimIndent()
 
         assertEquals(expectedDsl, dsl)

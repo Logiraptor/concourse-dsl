@@ -87,7 +87,7 @@ object Printer {
                 if (value.isEmpty()) return this
                 beginControlFlow(name)
                 value.forEach {
-                    addStatement("put(%S, %L)", it.key, generateLiteral(it.value))
+                    addStatement("this[%S] = %L", it.key, generateLiteral(it.value))
                 }
                 endControlFlow()
             }

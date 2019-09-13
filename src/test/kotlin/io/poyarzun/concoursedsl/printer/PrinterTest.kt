@@ -140,7 +140,7 @@ class PrinterTest {
                                     }
                                     imageResource("docker-image") {
                                         source {
-                                            put("resource", "maven")
+                                            this["resource"] = "maven"
                                         }
                                     }
                                     inputs {
@@ -165,15 +165,15 @@ class PrinterTest {
                                     }
                                 }
                                 inputMapping {
-                                    put("source-code", "concourse-dsl-source")
+                                    this["source-code"] = "concourse-dsl-source"
                                 }
                                 outputMapping {
-                                    put("result", "output")
+                                    this["result"] = "output"
                                 }
                             }
                             +put("results") {
                                 getParams {
-                                    put("skip_download", "true")
+                                    this["skip_download"] = "true"
                                 }
                             }
                         }
@@ -186,29 +186,29 @@ class PrinterTest {
                     +resourceType("rss", "docker-image") {
                         checkEvery = "10m"
                         source {
-                            put("tag", "latest")
-                            put("repository", "suhlig/concourse-rss-resource")
+                            this["tag"] = "latest"
+                            this["repository"] = "suhlig/concourse-rss-resource"
                         }
                     }
                 }
                 resources {
                     +resource("concourse-dsl-source", "git") {
                         source {
-                            put("other_nested", mapOf("foo" to "bar", "null_value" to null))
-                            put("nested", listOf("value1", "value2"))
-                            put("private_key", "((github-deploy-key))")
-                            put("uri", "git@github.com:Logiraptor/concourse-dsl")
-                            put("non-bool", 4)
-                            put("non-string", true)
+                            this["other_nested"] = mapOf("foo" to "bar", "null_value" to null)
+                            this["nested"] = listOf("value1", "value2")
+                            this["private_key"] = "((github-deploy-key))"
+                            this["uri"] = "git@github.com:Logiraptor/concourse-dsl"
+                            this["non-bool"] = 4
+                            this["non-string"] = true
                         }
                         checkEvery = "20m"
                         webhookToken = "totally-a-secret"
                     }
                     +resource("results", "s3") {
                         source {
-                            put("secret_key", "((aws_secret_key))")
-                            put("access_key", "((aws_access_key))")
-                            put("bucket", "results-bucket")
+                            this["secret_key"] = "((aws_secret_key))"
+                            this["access_key"] = "((aws_access_key))"
+                            this["bucket"] = "results-bucket"
                         }
                         checkEvery = ""
                         webhookToken = ""

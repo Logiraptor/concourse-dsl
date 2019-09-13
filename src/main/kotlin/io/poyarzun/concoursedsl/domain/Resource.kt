@@ -12,6 +12,7 @@ import io.poyarzun.concoursedsl.dsl.DslMap
 import io.poyarzun.concoursedsl.dsl.ResourceDeserializer
 import io.poyarzun.concoursedsl.dsl.StepDeserializer
 
+@ConcourseDslMarker
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonDeserialize(using = ResourceDeserializer::class)

@@ -2,9 +2,7 @@ package io.poyarzun.concoursedsl
 
 import io.poyarzun.concoursedsl.domain.*
 import io.poyarzun.concoursedsl.dsl.generateYML
-import io.poyarzun.concoursedsl.resources.cfResource
-import io.poyarzun.concoursedsl.resources.get
-import io.poyarzun.concoursedsl.resources.gitResource
+import io.poyarzun.concoursedsl.resources.*
 
 val nonProdCF = cfResource("non-prod") {
     source("https://api.sys.dev.cf.io", "dev", "dev") {
@@ -19,6 +17,25 @@ val prodCF = cfResource("prod") {
 val dslSourceCode = gitResource("concourse-dsl") {
     source("git@github.com:Logiraptor/concourse-dsl.git") {
         branch = "master"
+    }
+}
+
+val semverPipeline = pipeline {
+    resources {
+        +semverResource("iam-s3-resource-tile-version") {
+            source(SemverResource.S3, "eagle-ci-blobs", "iam-s3-resource-tile-version", "{{aws-access-key-id}}", "{{aws-secret-access-key}}") {
+                initialVersion = "0.0.25"
+            }
+            checkEvery = ""
+            webhookToken = ""
+        }
+        +resource("ci-docker-image", "docker-image") {
+            source {
+                this["password"] = "{{dockerhub-password}}"
+            }
+            checkEvery = ""
+            webhookToken = ""
+        }
     }
 }
 

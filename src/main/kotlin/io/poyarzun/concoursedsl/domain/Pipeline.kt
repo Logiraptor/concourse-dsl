@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 import io.poyarzun.concoursedsl.dsl.ConfigBlock
 import io.poyarzun.concoursedsl.dsl.DslList
 
+@ConcourseDslMarker
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 class Pipeline {
     var jobs = DslList.empty<Job>()

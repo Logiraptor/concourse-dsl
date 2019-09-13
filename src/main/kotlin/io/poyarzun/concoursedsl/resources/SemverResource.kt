@@ -2,6 +2,7 @@ package io.poyarzun.concoursedsl.resources
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
+import io.poyarzun.concoursedsl.domain.ConcourseDslMarker
 import io.poyarzun.concoursedsl.domain.Resource
 import io.poyarzun.concoursedsl.domain.Step
 import io.poyarzun.concoursedsl.dsl.ConfigBlock
@@ -62,6 +63,7 @@ class SemverResource(name: String) : Resource<SemverResource.SourceParams>(name,
         override val getParams = DslObject.from(SemverResource::GetParams)
     }
 
+    @ConcourseDslMarker
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
     open class SemverDriver {
         var initialVersion: String? = null

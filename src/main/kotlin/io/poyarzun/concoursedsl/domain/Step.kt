@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import io.poyarzun.concoursedsl.dsl.*
 
+@ConcourseDslMarker
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonDeserialize(using = StepDeserializer::class)

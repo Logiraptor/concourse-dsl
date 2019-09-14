@@ -192,8 +192,6 @@ class PrinterTest {
                     this["access_key"] = "((aws_access_key))"
                     this["bucket"] = "results-bucket"
                   }
-                  checkEvery = ""
-                  webhookToken = ""
                 }
 
 

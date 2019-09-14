@@ -12,7 +12,7 @@ data class ResourceType(val name: String, val type: String) {
     val tags: Tags = DslList.empty()
     val params: Params = DslMap.empty()
     var privileged: Boolean? = null
-    var checkEvery: String = ""
+    var checkEvery: String? = null
 }
 
 fun resourceType(name: String, type: String, configBlock: ConfigBlock<ResourceType>) =

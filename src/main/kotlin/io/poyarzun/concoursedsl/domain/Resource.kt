@@ -21,6 +21,6 @@ abstract class Resource<Source : Any>(val name: String, val type: String) {
 
     val tags: Tags = DslList.empty()
     val version: Version = DslMap.empty()
-    var checkEvery: String = ""
-    var webhookToken: String = ""
+    var checkEvery: String? = null
+    var webhookToken: String? = null
 }

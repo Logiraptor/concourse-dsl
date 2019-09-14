@@ -6,7 +6,6 @@ import io.poyarzun.concoursedsl.dsl.DslList
 import io.poyarzun.concoursedsl.dsl.DslMap
 import io.poyarzun.concoursedsl.dsl.DslObject
 import io.poyarzun.concoursedsl.dsl.readYML
-import io.poyarzun.concoursedsl.printer.Printer.generateJobsDsl
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.isSubclassOf
@@ -14,7 +13,7 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 
 object Printer {
-    val nameAllocator = NameAllocator()
+    private val nameAllocator = NameAllocator()
 
     fun convertYamlToDsl(yaml: String): String {
         val pipeline = readYML(yaml)
@@ -159,6 +158,13 @@ object Printer {
             }
             is DslList<*> -> {
                 if (value.isEmpty()) return this
+                if (value.all { it is String }) {
+                    val totalLength = value.sumBy { (it as String).length }
+                    val hasNewLines = value.any { (it as String).contains('\n') }
+                    if (totalLength < 100 && !hasNewLines) {
+                        return add(value.map { buildCodeBlock { add("%S", it) } }.joinToCode(prefix = "$name(", suffix = ")\n"))
+                    }
+                }
                 beginControlFlow(prefix + name + suffix)
                 (value as DslList<Any>).forEach {
                     when (it) {
@@ -178,7 +184,7 @@ object Printer {
         }
     }
 
-    fun generateLiteral(value: Any?): CodeBlock {
+    private fun generateLiteral(value: Any?): CodeBlock {
         return buildCodeBlock {
             when (value) {
                 is String -> add("%S", value)

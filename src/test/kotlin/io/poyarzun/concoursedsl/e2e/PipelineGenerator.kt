@@ -93,8 +93,7 @@ class PipelineGenerator(private val forger: Forger) {
             fl < 0.2 -> forger.aWord()
             fl < 0.4 -> forger.aBool()
             fl < 0.6 -> forger.aSmallInt()
-            fl < 0.8 -> forger.aList(2) { fillInLiteral(depth + 1) }
-            fl < 0.9 -> fillInLiteral(depth + 1)
+            fl < 0.8 && depth == 0 -> forger.aList(2) { fillInLiteral(depth + 1) }
             else -> null
         }
     }

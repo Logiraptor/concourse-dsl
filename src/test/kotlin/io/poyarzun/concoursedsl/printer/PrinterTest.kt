@@ -168,9 +168,7 @@ class PrinterTest {
                       }
                     }
                   }
-                  serialGroups {
-                    +"unique-jobs"
-                  }
+                  serialGroups("unique-jobs")
                 }
 
 
@@ -221,9 +219,7 @@ class PrinterTest {
                   }
                   groups {
                     +group("Source Code") {
-                      resources {
-                        +"concourse-dsl-source"
-                      }
+                      resources("concourse-dsl-source")
                     }
                   }
                 }

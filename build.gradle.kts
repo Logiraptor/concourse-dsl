@@ -1,8 +1,8 @@
-import java.net.URI
-import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
-import org.jetbrains.kotlin.noarg.gradle.NoArgExtension
 import org.gradle.jvm.tasks.Jar
+import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.noarg.gradle.NoArgExtension
+import java.net.URI
 
 plugins {
     kotlin("jvm") version "1.3.0"
@@ -24,7 +24,7 @@ configure<NoArgExtension> {
 }
 
 group = "io.poyarzun"
-version = "0.5.2"
+version = "0.6.0"
 
 repositories {
     jcenter()

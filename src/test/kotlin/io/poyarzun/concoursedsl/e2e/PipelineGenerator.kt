@@ -2,7 +2,6 @@ package io.poyarzun.concoursedsl.e2e
 
 import fr.xgouchet.elmyr.Forger
 import io.poyarzun.concoursedsl.domain.*
-import io.poyarzun.concoursedsl.dsl.DslList
 import io.poyarzun.concoursedsl.dsl.DslMap
 import io.poyarzun.concoursedsl.dsl.DslObject
 import kotlin.math.absoluteValue
@@ -23,11 +22,19 @@ class PipelineGenerator(private val forger: Forger) {
             klass.isSubclassOf(Boolean::class) -> forger.aBool() as T
             klass.isSubclassOf(Int::class) -> forger.aSmallInt() as T
             klass == Step::class -> {
-                return forger.anElementFrom(
-                        generateObject(GenericGetStep::class, depth + 1) as T,
-                        generateObject(GenericPutStep::class, depth + 1) as T,
-                        generateObject(Step.TaskStep::class, depth + 1) as T
+                val availableSteps = mutableListOf(
+                        generateObject(GenericGetStep::class, depth + 1),
+                        generateObject(GenericPutStep::class, depth + 1),
+                        generateObject(Step.TaskStep::class, depth + 1)
                 )
+
+                if (depth < 10) {
+                    availableSteps.add(generateObject(Step.TryStep::class, depth + 1))
+                    availableSteps.add(generateObject(Step.DoStep::class, depth + 1))
+                    availableSteps.add(generateObject(Step.AggregateStep::class, depth + 1))
+                }
+
+                return forger.anElementFrom(availableSteps) as T
             }
             else -> {
                 val params = mutableListOf<Any>()
@@ -47,7 +54,7 @@ class PipelineGenerator(private val forger: Forger) {
                     }
                     val returnType = it.returnType.classifier as KClass<Any>
                     when {
-                        returnType.isSubclassOf(DslList::class) -> fillInListProp(klass, it.name, it.get(obj) as DslList<Any>, depth + 1)
+                        returnType.isSubclassOf(MutableList::class) -> fillInListProp(klass, it.name, it.get(obj) as MutableList<Any>, depth + 1)
                         returnType.isSubclassOf(DslObject::class) -> fillInObjectProp(klass, it.name, it.get(obj) as DslObject<Any>, depth + 1)
                         returnType.isSubclassOf(DslMap::class) -> fillInMapProp(klass, it.name, it.get(obj) as DslMap<Any, Any?>)
                         it is KMutableProperty<*> -> {
@@ -61,14 +68,14 @@ class PipelineGenerator(private val forger: Forger) {
         }
     }
 
-    private fun <T : Any, K : Any> fillInListProp(parent: KClass<T>, name: String, list: DslList<K>, depth: Int) {
+    private fun <T : Any, K : Any> fillInListProp(parent: KClass<T>, name: String, list: MutableList<K>, depth: Int) {
         mappings.forEach {
             if (parent.isSubclassOf(it.parent) && name == it.name) {
                 list.generateList(it.elementType as KClass<K>, depth + 1)
                 return
             }
         }
-        throw IllegalStateException("$parent.$name")
+        TODO("$parent.$name")
     }
 
     private fun <T : Any> fillInMapProp(parent: KClass<T>, name: String, map: DslMap<Any, Any?>) {
@@ -108,10 +115,12 @@ class PipelineGenerator(private val forger: Forger) {
         throw IllegalStateException("$parent.$name")
     }
 
-    private fun <T : Any> DslList<T>.generateList(kClass: KClass<T>, depth: Int) {
-        val numberOfElements = forger.anInt(min = 0, max = 8)
+    private fun <T : Any> MutableList<T>.generateList(kClass: KClass<T>, depth: Int) {
+        // always generate at least 1 step here, so that `do`, etc blocks aren't empty
+        val min = if (kClass == Step::class) 1 else 0
+        val numberOfElements = forger.anInt(min = min, max = 8)
         repeat(numberOfElements) {
-            +generateObject(kClass, depth + 1)
+            add(generateObject(kClass, depth + 1))
         }
     }
 
@@ -133,6 +142,11 @@ class PipelineGenerator(private val forger: Forger) {
             Mapping(GenericGetStep::class as KClass<Any>, "passed", String::class as KClass<Any>),
             Mapping(GenericGetStep::class as KClass<Any>, "tags", String::class as KClass<Any>),
             Mapping(GenericPutStep::class as KClass<Any>, "tags", String::class as KClass<Any>),
+            Mapping(Step.TryStep::class as KClass<Any>, "tags", String::class as KClass<Any>),
+            Mapping(Step.AggregateStep::class as KClass<Any>, "aggregate", Step::class as KClass<Any>),
+            Mapping(Step.AggregateStep::class as KClass<Any>, "tags", String::class as KClass<Any>),
+            Mapping(Step.DoStep::class as KClass<Any>, "do", Step::class as KClass<Any>),
+            Mapping(Step.DoStep::class as KClass<Any>, "tags", String::class as KClass<Any>),
             Mapping(ResourceType::class as KClass<Any>, "tags", String::class as KClass<Any>),
             Mapping(Group::class as KClass<Any>, "jobs", String::class as KClass<Any>),
             Mapping(Group::class as KClass<Any>, "resources", String::class as KClass<Any>),

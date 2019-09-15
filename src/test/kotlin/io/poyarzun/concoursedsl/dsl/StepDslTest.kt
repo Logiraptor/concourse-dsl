@@ -76,9 +76,11 @@ class StepDslTest {
 
     @Test
     fun `try dsl collects one step into a try step`() {
-        val result = `try`(task("unit tests") {
+        val result = `try` {
+            task("unit tests") {
             file = "source-code/unit.yml"
-        })
+            }
+        }
 
         result.`try`.let { task ->
             assertTrue(task is Step.TaskStep)

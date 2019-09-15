@@ -6,13 +6,14 @@ import com.github.ajalt.clikt.parameters.arguments.ProcessedArgument
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.convert
 import com.github.ajalt.clikt.parameters.arguments.defaultLazy
-import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.file
-import com.github.ajalt.clikt.parameters.types.path
+import com.github.ajalt.clikt.parameters.options.NullableOption
+import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.options.defaultLazy
+import com.github.ajalt.clikt.parameters.options.option
 import io.poyarzun.concoursedsl.domain.Pipeline
 import io.poyarzun.concoursedsl.dsl.generateYML
 import io.poyarzun.concoursedsl.printer.Printer
-import java.io.*
+import java.io.File
 import javax.script.ScriptEngineManager
 
 class Kfly : CliktCommand() {
@@ -35,7 +36,7 @@ class Convert : CliktCommand(name = "generate-kt",help = "Convert yaml to kotlin
 
     override fun run() {
         val yaml = input.readText()
-        val dsl = Printer.convertYamlToDsl(yaml)
+        val dsl = Printer().convertYamlToDsl(yaml)
         output.use {
             it.write(dsl)
         }

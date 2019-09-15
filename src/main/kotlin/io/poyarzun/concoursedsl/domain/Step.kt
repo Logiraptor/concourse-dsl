@@ -61,19 +61,31 @@ sealed class Step {
     }
 
     @JsonDeserialize(using = JsonDeserializer.None::class)
-    data class AggregateStep(val aggregate: DslList<Step> = DslList.empty()) : Step()
+    class AggregateStep : Step() {
+        val aggregate: MutableList<Step> = mutableListOf()
+
+        operator fun Step.unaryPlus() = this@AggregateStep.aggregate.add(this)
+    }
 
     @JsonDeserialize(using = JsonDeserializer.None::class)
-    data class DoStep(val `do`: DslList<Step> = DslList.empty()) : Step()
+    class DoStep : Step() {
+        val `do`: MutableList<Step> = mutableListOf()
+
+        operator fun Step.unaryPlus() = this@DoStep.`do`.add(this)
+    }
 
     @JsonDeserialize(using = JsonDeserializer.None::class)
-    data class TryStep(val `try`: Step) : Step()
+    class TryStep : Step() {
+        lateinit var `try`: Step
+    }
 }
 
-fun `try`(step: Step) = Step.TryStep(step)
+fun `try`(init: Step.TryStep.() -> Step) =
+        Step.TryStep().apply { `try` = init() }
 
-fun `do`(configBlock: ConfigBlock<DslList<Step>>) =
-        Step.DoStep(DslList.empty<Step>().apply(configBlock))
+fun `do`(configBlock: ConfigBlock<Step.DoStep>): Step.DoStep =
+        Step.DoStep().apply(configBlock)
 
-fun aggregate(configBlock: ConfigBlock<DslList<Step>>) =
-        Step.AggregateStep(DslList.empty<Step>().apply(configBlock))
+fun aggregate(configBlock: ConfigBlock<Step.AggregateStep>) =
+        Step.AggregateStep().apply(configBlock)
+

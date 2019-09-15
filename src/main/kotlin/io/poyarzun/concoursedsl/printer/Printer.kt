@@ -12,7 +12,7 @@ import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 
-object Printer {
+class Printer {
     private val nameAllocator = NameAllocator()
 
     fun convertYamlToDsl(yaml: String): String {
@@ -38,83 +38,66 @@ object Printer {
     }
 
     private fun FileSpec.Builder.pipelineToSource(pipeline: Pipeline): FileSpec.Builder {
-        val jobNames = pipeline.jobs.map(::jobToFunctionName)
+        val jobNames = pipeline.jobs.map { nameAllocator.newName(it.name) }
         pipeline.jobs.forEachIndexed { i, it ->
             addFunction(FunSpec.builder(jobNames[i]).addStatement("return %L", buildCodeBlock {
-                generateConstructorDsl("", "", typeToName(Job::class), it)
+                generateConstructorDsl(typeToName(Job::class), it)
             }).build())
         }
-        val resourceNames = pipeline.resources.map { resourceToFunctionName(it as GenericResource) }
+        val resourceNames = pipeline.resources.map { nameAllocator.newName(it.name) }
         pipeline.resources.forEachIndexed { i, it ->
             addFunction(FunSpec.builder(resourceNames[i]).addStatement("return %L", buildCodeBlock {
-                generateConstructorDsl("", "", typeToName(GenericResource::class), it)
+                generateConstructorDsl(typeToName(GenericResource::class), it)
             }).build())
         }
-        val resourceTypeNames = pipeline.resourceTypes.map(::resourceTypeToFunctionName)
+        val resourceTypeNames = pipeline.resourceTypes.map { nameAllocator.newName(it.name) }
         pipeline.resourceTypes.forEachIndexed { i, it ->
             addFunction(FunSpec.builder(resourceTypeNames[i]).addStatement("return %L", buildCodeBlock {
-                generateConstructorDsl("", "", typeToName(ResourceType::class), it)
+                generateConstructorDsl(typeToName(ResourceType::class), it)
             }).build())
         }
 
         return addFunction(FunSpec.builder("mainPipeline")
                 .beginControlFlow("return pipeline")
-                .generateJobsDsl(jobNames, pipeline)
-                .generateResourcesDsl(resourceNames, pipeline)
-                .generateResourceTypesDsl(resourceTypeNames, pipeline)
+                .generatePlusFunctionCalls(jobNames, "jobs")
+                .generatePlusFunctionCalls(resourceNames, "resources")
+                .generatePlusFunctionCalls(resourceTypeNames, "resourceTypes")
                 .addCode(buildCodeBlock {
-                    generatePropertyDsl("", "", "groups", pipeline.groups)
+                    generatePropertyDsl("groups", pipeline.groups)
                 })
                 .endControlFlow()
                 .build())
     }
 
-    private fun FunSpec.Builder.generateJobsDsl(names: List<String>, pipeline: Pipeline): FunSpec.Builder {
-        beginControlFlow("jobs")
-        pipeline.jobs.forEachIndexed { i, _ ->
-            addStatement("+%N()", names[i])
+    private fun FunSpec.Builder.generatePlusFunctionCalls(names: List<String>, name: String): FunSpec.Builder {
+        beginControlFlow(name)
+        names.forEach {
+            addStatement("+%N()", it)
         }
         return endControlFlow()
     }
 
-    private fun FunSpec.Builder.generateResourcesDsl(names: List<String>, pipeline: Pipeline): FunSpec.Builder {
-        beginControlFlow("resources")
-        pipeline.resources.forEachIndexed { i, it ->
-            addStatement("+%N()", names[i])
-        }
-        return endControlFlow()
-    }
-
-    private fun FunSpec.Builder.generateResourceTypesDsl(names: List<String>, pipeline: Pipeline): FunSpec.Builder {
-        beginControlFlow("resourceTypes")
-        pipeline.resourceTypes.forEachIndexed { i, it ->
-            addStatement("+%N()", names[i])
-        }
-        return endControlFlow()
-    }
-
-    private fun jobToFunctionName(job: Job): String {
-        return nameAllocator.newName(job.name)
-    }
-
-    private fun resourceToFunctionName(resource: GenericResource): String {
-        return nameAllocator.newName(resource.name)
-    }
-
-    private fun resourceTypeToFunctionName(resourceType: ResourceType): String {
-        return nameAllocator.newName(resourceType.name)
-    }
-
-    private fun <T : Any> generateDsl(value: T, type: KClass<T>) = buildCodeBlock {
-        generateConstructorDsl("", "", typeToName(type), value)
-    }
-
-    private fun <T : Any> CodeBlock.Builder.generateConstructorDsl(prefix: String, suffix: String, name: String, value: T): CodeBlock.Builder {
+    private fun <T : Any> CodeBlock.Builder.generateConstructorDsl(name: String, value: T): CodeBlock.Builder {
 
         when (value) {
-            is Step.AggregateStep -> return generatePropertyDsl(prefix, suffix, "aggregate", value.aggregate)
-            is Step.DoStep -> return generatePropertyDsl(prefix, suffix, "`do`", value.`do`)
-            is Step.TryStep -> return add("$prefix`try`(%L)$suffix", generateDsl(value.`try`, value.`try`.javaClass.kotlin))
+            is Step.AggregateStep -> {
+                return beginControlFlow("aggregate")
+                        .generatePlusDsl(value.aggregate)
+                        .generateMemberPropertiesExcept(Step.AggregateStep::class, listOf("aggregate"), value)
+                        .endControlFlow()
+            }
+            is Step.DoStep -> {
+                return beginControlFlow("`do`")
+                        .generatePlusDsl(value.`do`)
+                        .generateMemberPropertiesExcept(Step.DoStep::class, listOf("do"), value)
+                        .endControlFlow()
+            }
+            is Step.TryStep -> {
+                return beginControlFlow("`try`")
+                        .generateMemberPropertiesExcept(Step.TryStep::class, listOf("try"), value)
+                        .generateConstructorDsl(typeToName(value.`try`.javaClass.kotlin), value.`try`)
+                        .endControlFlow()
+            }
         }
 
         val type = value.javaClass.kotlin
@@ -126,24 +109,29 @@ object Printer {
             else -> ""
         }
         val args = params.map { it.value }.toTypedArray()
-        beginControlFlow("$prefix$name$paramTemplate$suffix", *args)
+        val argNames = params.map { it.name }
+        return beginControlFlow("$name$paramTemplate", *args)
+                .generateMemberPropertiesExcept(type, argNames, value)
+                .endControlFlow()
+    }
+
+    private fun <T : Any> CodeBlock.Builder.generateMemberPropertiesExcept(type: KClass<T>, params: List<String?>, value: T): CodeBlock.Builder {
         type.memberProperties.forEach { prop ->
-            val specifiedInConstructor = params.any { it.name == prop.name }
-            if (specifiedInConstructor) {
+            val filtered = params.any { it == prop.name }
+            if (filtered) {
                 return@forEach
             }
             val classifier = prop.returnType.classifier
             if (classifier is KClass<*>) {
                 val propValue = prop.get(value) ?: return@forEach
 
-                generatePropertyDsl("", "", prop.name, propValue)
+                generatePropertyDsl(prop.name, propValue)
             }
         }
-        return endControlFlow()
+        return this
     }
 
-
-    private fun <T : Any> CodeBlock.Builder.generatePropertyDsl(prefix: String, suffix: String, name: String, value: T): CodeBlock.Builder {
+    private fun <T : Any> CodeBlock.Builder.generatePropertyDsl(name: String, value: T): CodeBlock.Builder {
         return when (value) {
             is String -> addStatement("$name = %S", value)
             is Int -> addStatement("$name = %L", value)
@@ -165,43 +153,29 @@ object Printer {
                         return add(value.map { buildCodeBlock { add("%S", it) } }.joinToCode(prefix = "$name(", suffix = ")\n"))
                     }
                 }
-                beginControlFlow(prefix + name + suffix)
-                (value as DslList<Any>).forEach {
-                    when (it) {
-                        is String -> addStatement("+%S", it)
-                        else -> generateConstructorDsl("+", "", typeToName(it.javaClass.kotlin), it)
-                    }
-                }
-                endControlFlow()
+
+                return beginControlFlow(name)
+                        .generatePlusDsl<T>(value)
+                        .endControlFlow()
             }
             is DslObject<*> -> {
                 val innerVal = value.value ?: return this
-                generateConstructorDsl(prefix, suffix, name, innerVal)
+                generateConstructorDsl(name, innerVal)
             }
             else -> {
-                generateConstructorDsl("$name = ", "", typeToName(value.javaClass.kotlin), value)
+                add("$name = %L", buildCodeBlock { generateConstructorDsl(typeToName(value.javaClass.kotlin), value) })
             }
         }
     }
 
-    private fun generateLiteral(value: Any?): CodeBlock {
-        return buildCodeBlock {
-            when (value) {
-                is String -> add("%S", value)
-                is List<*> -> add(value.map(::generateLiteral).joinToCode(prefix = "listOf(", suffix = ")"))
-                is Int -> add("%L", value)
-                is Boolean -> add("%L", value)
-                is Map<*, *> -> add(value.map {
-                    buildCodeBlock {
-                        add("%S to %L", it.key, generateLiteral(it.value))
-                    }
-                }.joinToCode(prefix = "mapOf(", suffix = ")"))
-                else -> when (value) {
-                    null -> add("null")
-                    else -> add("TODO(%S)", "Cannot generate dsl for literal: $value")
-                }
+    private fun <T : Any> CodeBlock.Builder.generatePlusDsl(value: T): CodeBlock.Builder {
+        (value as MutableList<Any>).forEach {
+            when (it) {
+                is String -> addStatement("+%S", it)
+                else -> add("+%L", buildCodeBlock { generateConstructorDsl(typeToName(it.javaClass.kotlin), it) })
             }
         }
+        return this
     }
 
     data class ConfiguredContructorArg(
@@ -217,7 +191,7 @@ object Printer {
 
         primaryConstructor.parameters.forEach { param ->
             if (!param.isOptional) {
-                val backingPropertyValue = findPropertyValue(value, type, param.name)
+                val backingPropertyValue = value.lookupProperty(param.name)
 
                 if (backingPropertyValue == null) {
                     params.add(ConfiguredContructorArg(
@@ -257,13 +231,32 @@ object Printer {
         }
     }
 
-    private fun <T : Any> findPropertyValue(value: T, type: KClass<T>, param: String?): Any? {
-        type.members.forEach {
-            if (it is KProperty<*> && it.name == param) {
-                return it.getter.call(value)
+    private fun generateLiteral(value: Any?): CodeBlock {
+        return buildCodeBlock {
+            when (value) {
+                is String -> add("%S", value)
+                is List<*> -> add(value.map(::generateLiteral).joinToCode(prefix = "listOf(", suffix = ")"))
+                is Int -> add("%L", value)
+                is Boolean -> add("%L", value)
+                is Map<*, *> -> add(value.map {
+                    buildCodeBlock {
+                        add("%S to %L", it.key, generateLiteral(it.value))
+                    }
+                }.joinToCode(prefix = "mapOf(", suffix = ")"))
+                else -> when (value) {
+                    null -> add("null")
+                    else -> add("TODO(%S)", "Cannot generate dsl for literal: $value")
+                }
             }
         }
-        return null
     }
 }
 
+private fun <T : Any> T.lookupProperty(param: String?): Any? {
+    javaClass.kotlin.members.forEach {
+        if (it is KProperty<*> && it.name == param) {
+            return it.getter.call(this)
+        }
+    }
+    return null
+}

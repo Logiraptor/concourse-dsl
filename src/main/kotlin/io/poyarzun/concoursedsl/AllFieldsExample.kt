@@ -208,9 +208,11 @@ private fun exhaustiveSteps(recurse: Boolean = false): Step {
                 +exhaustiveSteps()
             }
 
-            +`try`(get("try-get-name") {
-                baseValues()
-            })
+            +`try` {
+                get("try-get-name") {
+                    baseValues()
+                }
+            }
         }
     }
 }

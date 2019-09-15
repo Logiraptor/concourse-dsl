@@ -1,16 +1,16 @@
 package io.poyarzun.concoursedsl.dsl
 
 import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier
-import java.io.IOException
 import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.core.TreeNode
 import com.fasterxml.jackson.databind.*
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier
 import io.poyarzun.concoursedsl.domain.*
-import kotlin.reflect.*
+import java.io.IOException
+import kotlin.reflect.KClass
 
 
 object DslModule : SimpleModule() {
@@ -58,7 +58,11 @@ class StepDeserializer : StdDeserializer<Step>(Step::class.java) {
             node.get("do") != null -> p.codec.treeToValue(node, Step.DoStep::class.java)
             node.get("aggregate") != null -> p.codec.treeToValue(node, Step.AggregateStep::class.java)
             node.get("try") != null -> p.codec.treeToValue(node, Step.TryStep::class.java)
-            else -> TODO("Cannot deserialize step, no standard step attributes found")
+            else -> {
+                val fieldNames = mutableListOf<String>()
+                node.fieldNames().forEach { fieldNames.add(it) }
+                TODO("Cannot deserialize step, no standard step attributes found in ($fieldNames)")
+            }
         }
     }
 }

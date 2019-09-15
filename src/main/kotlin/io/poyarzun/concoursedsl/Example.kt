@@ -126,7 +126,7 @@ private fun Pipeline.sharedTemplate(name: String) {
 
                     }
 
-                    +`try`(get(sourceCodeResource) {})
+                    +`try` { get(sourceCodeResource) {} }
                 }
             }
         }

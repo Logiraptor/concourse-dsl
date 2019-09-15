@@ -41,15 +41,17 @@ class DslEndToEndTests {
     fun testDslRoundTrip() {
         val pipeline = PipelineGenerator(forger).generateRandomPipeline()
         val yaml = generateYML(pipeline)
-        val dsl = Printer.convertYamlToDsl(yaml)
+        val dsl = Printer().convertYamlToDsl(yaml)
         try {
             Tests.scriptEngine.eval(dsl)
             val resultPipeline = Tests.scriptEngine.eval("mainPipeline()") as Pipeline
             val resultYaml = generateYML(resultPipeline)
+            val resultDsl = Printer().convertYamlToDsl(resultYaml)
 
-            assertEquals(yaml, resultYaml)
+            assertEquals(yaml + dsl, resultYaml + resultDsl)
         } catch (e: ScriptException) {
             println(yaml)
+            println(dsl)
             rethrow(e)
         }
     }

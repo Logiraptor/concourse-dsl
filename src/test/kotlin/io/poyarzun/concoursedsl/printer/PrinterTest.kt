@@ -88,7 +88,7 @@ class PrinterTest {
 
         """.trimIndent()
 
-        val dsl = Printer.convertYamlToDsl(testYaml)
+        val dsl = Printer().convertYamlToDsl(testYaml)
 
         val expectedDsl = """
                 package pipeline

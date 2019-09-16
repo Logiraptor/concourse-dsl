@@ -99,6 +99,7 @@ class PrinterTest {
                 import io.poyarzun.concoursedsl.domain.cache
                 import io.poyarzun.concoursedsl.domain.get
                 import io.poyarzun.concoursedsl.domain.group
+                import io.poyarzun.concoursedsl.domain.inParallel
                 import io.poyarzun.concoursedsl.domain.input
                 import io.poyarzun.concoursedsl.domain.job
                 import io.poyarzun.concoursedsl.domain.output

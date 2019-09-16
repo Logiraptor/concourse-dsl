@@ -1,5 +1,6 @@
 package io.poyarzun.concoursedsl.domain
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
@@ -19,6 +20,7 @@ sealed class Step {
     var onSuccess: Step? = null
     var onFailure: Step? = null
     var onAbort: Step? = null
+    var onError: Step? = null
     var ensure: Step? = null
 
     @NoArg
@@ -41,6 +43,7 @@ sealed class Step {
         abstract val params: PutParams
         abstract val getParams: GetParams
         var resource: String? = null
+        val inputs = DslList.empty<String>()
     }
 
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
@@ -57,6 +60,7 @@ sealed class Step {
 
         var privileged: Boolean? = null
         var params: Params = DslMap.empty()
+        val vars: Params = DslMap.empty()
         var image: String? = null
     }
 
@@ -65,6 +69,32 @@ sealed class Step {
         val aggregate: MutableList<Step> = mutableListOf()
 
         operator fun Step.unaryPlus() = this@AggregateStep.aggregate.add(this)
+    }
+
+    @JsonDeserialize(using = JsonDeserializer.None::class)
+    class InParallelStep : Step() {
+        val inParallel = InParallelConfig()
+
+        @get:JsonIgnore
+        val steps = inParallel.steps
+        @get:JsonIgnore
+        var limit: Int?
+            get() = inParallel.limit
+            set(value) {
+                inParallel.limit = value
+            }
+        @get:JsonIgnore
+        var failFast: Boolean?
+            get() = inParallel.failFast
+            set(value) {
+                inParallel.failFast = value
+            }
+
+        class InParallelConfig {
+            val steps = DslList.empty<Step>()
+            var limit: Int? = null
+            var failFast: Boolean? = null
+        }
     }
 
     @JsonDeserialize(using = JsonDeserializer.None::class)
@@ -89,3 +119,5 @@ fun `do`(configBlock: ConfigBlock<Step.DoStep>): Step.DoStep =
 fun aggregate(configBlock: ConfigBlock<Step.AggregateStep>) =
         Step.AggregateStep().apply(configBlock)
 
+fun inParallel(configBlock: ConfigBlock<Step.InParallelStep>) =
+        Step.InParallelStep().apply(configBlock)

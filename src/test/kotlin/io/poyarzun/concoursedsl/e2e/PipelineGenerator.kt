@@ -32,6 +32,7 @@ class PipelineGenerator(private val forger: Forger) {
                     availableSteps.add(generateObject(Step.TryStep::class, depth + 1))
                     availableSteps.add(generateObject(Step.DoStep::class, depth + 1))
                     availableSteps.add(generateObject(Step.AggregateStep::class, depth + 1))
+                    availableSteps.add(generateObject(Step.InParallelStep::class, depth + 1))
                 }
 
                 return forger.anElementFrom(availableSteps) as T
@@ -137,14 +138,19 @@ class PipelineGenerator(private val forger: Forger) {
             Mapping(Pipeline::class as KClass<Any>, "resources", GenericResource::class as KClass<Any>),
             Mapping(Job::class as KClass<Any>, "plan", Step::class as KClass<Any>),
             Mapping(Job::class as KClass<Any>, "serialGroups", String::class as KClass<Any>),
+            Mapping(Job::class as KClass<Any>, "buildLogRetention", Job.RetentionConfig::class as KClass<Any>),
             Mapping(GenericResource::class as KClass<Any>, "tags", String::class as KClass<Any>),
             Mapping(GenericResource::class as KClass<Any>, "version", String::class as KClass<Any>),
             Mapping(GenericGetStep::class as KClass<Any>, "passed", String::class as KClass<Any>),
             Mapping(GenericGetStep::class as KClass<Any>, "tags", String::class as KClass<Any>),
             Mapping(GenericPutStep::class as KClass<Any>, "tags", String::class as KClass<Any>),
+            Mapping(GenericPutStep::class as KClass<Any>, "inputs", String::class as KClass<Any>),
             Mapping(Step.TryStep::class as KClass<Any>, "tags", String::class as KClass<Any>),
             Mapping(Step.AggregateStep::class as KClass<Any>, "aggregate", Step::class as KClass<Any>),
             Mapping(Step.AggregateStep::class as KClass<Any>, "tags", String::class as KClass<Any>),
+            Mapping(Step.InParallelStep.InParallelConfig::class as KClass<Any>, "steps", Step::class as KClass<Any>),
+            Mapping(Step.InParallelStep::class as KClass<Any>, "steps", Step::class as KClass<Any>),
+            Mapping(Step.InParallelStep::class as KClass<Any>, "tags", String::class as KClass<Any>),
             Mapping(Step.DoStep::class as KClass<Any>, "do", Step::class as KClass<Any>),
             Mapping(Step.DoStep::class as KClass<Any>, "tags", String::class as KClass<Any>),
             Mapping(ResourceType::class as KClass<Any>, "tags", String::class as KClass<Any>),
@@ -158,6 +164,7 @@ class PipelineGenerator(private val forger: Forger) {
             Mapping(Task::class as KClass<Any>, "inputs", Task.Input::class as KClass<Any>),
             Mapping(Task::class as KClass<Any>, "outputs", Task.Output::class as KClass<Any>),
             Mapping(Task::class as KClass<Any>, "run", Task.RunConfig::class as KClass<Any>),
+            Mapping(Task::class as KClass<Any>, "containerLimits", Task.ContainerLimits::class as KClass<Any>),
             Mapping(Task.RunConfig::class as KClass<Any>, "args", String::class as KClass<Any>),
             Mapping(Task.Resource::class as KClass<Any>, "version", String::class as KClass<Any>),
             Mapping(Task::class as KClass<Any>, "caches", Task.Cache::class as KClass<Any>)

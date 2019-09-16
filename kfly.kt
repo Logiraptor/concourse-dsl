@@ -1,4 +1,4 @@
-@file:DependsOn("io.poyarzun:concourse-dsl:0.5.2")
+@file:DependsOn("io.poyarzun:concourse-dsl:0.7.0")
 
 import java.io.File
 import io.poyarzun.concoursedsl.printer.Printer

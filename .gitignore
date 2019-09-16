@@ -3,3 +3,5 @@ build/
 out/
 .gradle/
 integration/concourse-docker
+
+concourse-docs

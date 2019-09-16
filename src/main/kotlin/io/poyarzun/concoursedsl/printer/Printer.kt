@@ -20,7 +20,7 @@ class Printer {
 
         val file = FileSpec.builder("pipeline", "Main")
                 .addImport("io.poyarzun.concoursedsl.domain",
-                        "pipeline",
+                        "pipeline", "inParallel",
                         "group", "aggregate", "cache", "input", "output",
                         "task", "do", "resourceType", "try",
                         "job", "resource", "put", "get"
@@ -80,6 +80,12 @@ class Printer {
     private fun <T : Any> CodeBlock.Builder.generateConstructorDsl(name: String, value: T): CodeBlock.Builder {
 
         when (value) {
+            is Step.InParallelStep -> {
+                return beginControlFlow("inParallel")
+                        .generateMemberPropertiesExcept(Step.InParallelStep.InParallelConfig::class, emptyList(), value.inParallel)
+                        .generateMemberPropertiesExcept(Step.InParallelStep::class, listOf("inParallel"), value)
+                        .endControlFlow()
+            }
             is Step.AggregateStep -> {
                 return beginControlFlow("aggregate")
                         .generatePlusDsl(value.aggregate)
@@ -217,6 +223,7 @@ class Printer {
             type.isSubclassOf(Group::class) -> "group"
             type.isSubclassOf(Job::class) -> "job"
             type.isSubclassOf(Step.AggregateStep::class) -> "aggregate"
+            type.isSubclassOf(Step.InParallelStep::class) -> "inParallel"
             type.isSubclassOf(GenericGetStep::class) -> "get"
             type.isSubclassOf(GenericPutStep::class) -> "put"
             type.isSubclassOf(Step.TaskStep::class) -> "task"

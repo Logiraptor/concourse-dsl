@@ -128,6 +128,19 @@ private fun Pipeline.sharedTemplate(name: String) {
 
                     +`try` { get(sourceCodeResource) {} }
                 }
+                +inParallel {
+                    steps {
+                        +put("b") {}
+                        +put("c") {}
+                        +put("d") {}
+                        +put("e") {}
+                        +put("f") {}
+                    }
+                    limit = 3
+                    failFast = true
+
+                    ensure = get("a") {}
+                }
             }
         }
     }

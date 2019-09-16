@@ -57,6 +57,7 @@ class StepDeserializer : StdDeserializer<Step>(Step::class.java) {
             node.get("task") != null -> p.codec.treeToValue(node, Step.TaskStep::class.java)
             node.get("do") != null -> p.codec.treeToValue(node, Step.DoStep::class.java)
             node.get("aggregate") != null -> p.codec.treeToValue(node, Step.AggregateStep::class.java)
+            node.get("in_parallel") != null -> p.codec.treeToValue(node, Step.InParallelStep::class.java)
             node.get("try") != null -> p.codec.treeToValue(node, Step.TryStep::class.java)
             else -> {
                 val fieldNames = mutableListOf<String>()
@@ -78,6 +79,8 @@ class ResourceDeserializer : StdDeserializer<GenericResource>(Resource::class.ja
 class TaskDslObjectDeserializer: DslObjectDeserializer<Task>(Task::class, { DslObject.from(::Task) })
 class ResourceDslObjectDeserializer: DslObjectDeserializer<Task.Resource>(Task.Resource::class, { DslObject.from(Task::Resource) })
 class RunConfigDslObjectDeserializer: DslObjectDeserializer<Task.RunConfig>(Task.RunConfig::class, { DslObject.from(Task::RunConfig) })
+class ContainerLimitsDslObjectDeserializer : DslObjectDeserializer<Task.ContainerLimits>(Task.ContainerLimits::class, { DslObject.from(Task::ContainerLimits) })
+class RetentionConfigDslObjectDeserializer : DslObjectDeserializer<Job.RetentionConfig>(Job.RetentionConfig::class, { DslObject.from(Job::RetentionConfig) })
 
 open class DslObjectDeserializer<T : Any>(private val kClass: KClass<T>, private val ctor: () -> DslObject<T>) : JsonDeserializer<DslObject<T>>() {
     override fun deserialize(parser: JsonParser, context: DeserializationContext): DslObject<T> {

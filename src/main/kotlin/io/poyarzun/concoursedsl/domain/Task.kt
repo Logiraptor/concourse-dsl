@@ -19,11 +19,18 @@ data class Task(val platform: String) {
     val outputs = DslList.empty<Output>()
     val caches = DslList.empty<Cache>()
     val params: Params = DslMap.empty()
+    @JsonDeserialize(using = ContainerLimitsDslObjectDeserializer::class)
+    val containerLimits = DslObject.from(::ContainerLimits)
 
     class RunConfig(val path: String) {
         val args = DslList.empty<String>()
         var dir: String? = null
         var user: String? = null
+    }
+
+    class ContainerLimits {
+        var cpu: Int? = null
+        var memory: Int? = null
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
